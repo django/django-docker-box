@@ -1,14 +1,14 @@
 version: "2.3"
 
 x-base: &base
-  image: tomforbes/django-docker-box:${PYTHON_VERSION}
+  image: djangobox/django-docker-box:${PYTHON_VERSION}
   build:
     context: ${DJANGO_PATH}
     dockerfile: ${PWD}/Dockerfile
     args:
     - PYTHON_VERSION=${PYTHON_VERSION}
     cache_from:
-    - tomforbes/django-docker-box:${PYTHON_VERSION}
+    - djangobox/django-docker-box:${PYTHON_VERSION}
   volumes:
   - ${DJANGO_PATH}:/tests/django/
   - ./settings:/tests/django/tests/settings
@@ -65,7 +65,7 @@ services:
     - postgres-gis-db
   postgres-gis-db:
     <<: *postgres-base
-    image: tomforbes/django-docker-box:postgres-gis-${POSTGRES_VERSION}-${POSTGIS_VERSION}
+    image: djangobox/django-docker-box:postgres-gis-${POSTGRES_VERSION}-${POSTGIS_VERSION}
     build:
       dockerfile: Dockerfile-postgis
       context: .
@@ -126,7 +126,7 @@ services:
 
   oracle:
     <<: *base
-    image: tomforbes/django-docker-box:oracle-${PYTHON_VERSION}
+    image: djangobox/django-docker-box:oracle-${PYTHON_VERSION}
     environment:
     - DJANGO_SETTINGS_MODULE=settings.test_oracle
     - WAIT_FOR=oracle-db:1521
