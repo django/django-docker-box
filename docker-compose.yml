@@ -136,7 +136,7 @@ services:
     - memcached
     - memcached2
   oracle-db:
-    image: sath89/oracle-12c
+    image: truevoly/oracle-12c
     volumes:
     - oracle:/u01/app/oracle/
     environment:
