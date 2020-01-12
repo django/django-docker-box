@@ -16,14 +16,6 @@ RUN apt-get update \
 
 RUN groupadd -r test && useradd --no-log-init -r -g test test
 
-RUN mkdir /geolite2/ \
-    && cd /geolite2/ \
-    && wget -q http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz \
-        http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz \
-    && (cat *.tar.gz | tar zxvf - --wildcards "*.mmdb" --strip-components=1 -i) \
-    && rm *.tar.gz \
-    && cd /
-
 RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /bin/wait-for-it.sh \
     && chmod a+x /bin/wait-for-it.sh
 
