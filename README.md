@@ -43,7 +43,7 @@ Simply substitute `sqlite` for any supported database:
 
 `docker-compose run --rm mariadb [args]`
 
-And if you're a madman you can run all the tests for all databases in parallel:
+And if you're mad you can run all the tests for all databases in parallel:
 
 `docker-compose up`
 
