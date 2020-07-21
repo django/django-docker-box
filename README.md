@@ -64,8 +64,8 @@ You can also pull the pre-built image in the same way:
 ## Oracle
 
 As usual Oracle is a bit more complex to set up. You need to download the latest `instantclient` **zip file**
-[from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the 
-`./oracle` directory. Ensure only one `.zip` file is present.
+[from this page](https://www.oracle.com/database/technologies/instant-client/linux-x86-64-downloads.html)
+and place it inside the `./oracle` directory. Ensure only one `.zip` file is present.
 
 The database image is quite large (several gigabytes) and takes a fairly long time to initialise (5-10 minutes). 
 Once it has initialised subsequent starts should be very quick. To begin this process run:
