@@ -65,13 +65,7 @@ services:
     - postgres-gis-db
   postgres-gis-db:
     <<: *postgres-base
-    image: djangobox/django-docker-box:postgres-gis-${POSTGRES_VERSION}-${POSTGIS_VERSION}
-    build:
-      dockerfile: Dockerfile-postgis
-      context: .
-      args:
-      - POSTGRES_VERSION=${POSTGRES_VERSION}
-      - POSTGIS_VERSION=${POSTGIS_VERSION}
+    image: postgis/postgis:${POSTGRES_VERSION}-${POSTGIS_VERSION}
 
   mysql:
     <<: *base
