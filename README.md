@@ -97,7 +97,7 @@ To enter a bash shell within the container, run:
 | Environment Variable | Default | Description |
 | --- | --- | --- |
 | `DJANGO_PATH` | None | The path to the Django codebase on your local machine |
-| `PYTHON_VERSION` | `3.6` | The python version to run tests against |
+| `PYTHON_VERSION` | `3.8` | The python version to run tests against |
 | `POSTGRES_VERSION` | `9.6` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
 | `MARIADB_VERSION` | `10.4` | The mariadb version to use |
