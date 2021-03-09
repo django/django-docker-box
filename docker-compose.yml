@@ -171,7 +171,7 @@ services:
     volumes:
     - /dev/shm:/dev/shm
 
-  # Firefox tests fail on master
+  # Firefox tests fail on main
   firefox:
     <<: *base
     command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub

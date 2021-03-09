@@ -123,4 +123,4 @@ deploy:
   provider: script
   script: bash docker_push.sh $COMPOSE_APP
   on:
-    branch: master
+    branch: main
