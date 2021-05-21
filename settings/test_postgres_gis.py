@@ -41,3 +41,4 @@ GEOIP_PATH = '/geolite2/'
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_DIR = '/tests/results'
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+USE_TZ = False
