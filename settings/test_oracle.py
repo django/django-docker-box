@@ -34,16 +34,16 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     },
-    'memcached': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+    'pymemcache': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         'LOCATION': 'memcached:11211',
-        'KEY_PREFIX': '1:'
+        'KEY_PREFIX': 'pymemcache:',
     },
-    'memcached_2': {
+    'pylibmc': {
         'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
         'LOCATION': 'memcached2:11211',
-        'KEY_PREFIX': '2:'
-    }
+        'KEY_PREFIX': 'pylibmc:',
+    },
 }
 
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
