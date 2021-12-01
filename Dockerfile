@@ -1,15 +1,15 @@
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}-slim-bullseye
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
           libmemcached-dev \
           build-essential \
-          libsqlite3-mod-spatialite binutils libproj-dev gdal-bin libgdal20 libgeoip1 \
+          libsqlite3-mod-spatialite binutils libproj-dev gdal-bin libgdal28 libgeoip1 \
           default-libmysqlclient-dev default-mysql-client \
           libpq-dev \
           unzip libaio1 \
-          libenchant1c2a \
+          libenchant-2-2 \
           gettext \
           wget \
     && apt-get clean
