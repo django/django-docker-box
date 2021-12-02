@@ -32,4 +32,4 @@ RUN mkdir /tests/results && chown -R test:test /tests/results/
 USER test:test
 ENV PYTHONPATH "${PYTHONPATH}:/tests/django/"
 VOLUME /tests/django
-WORKDIR /tests/django
+WORKDIR /tests/django/tests

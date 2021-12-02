@@ -15,7 +15,7 @@ x-base: &base
   - ./oracle_entrypoint.sh:/oracle_entrypoint.sh
   # Using yaml merging here overwrites the arrays. Simpler to just mount this in every service.
   - ./oracle:/oracle
-  entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python tests/runtests.py $$@" --
+  entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
 
 x-postgres-base: &postgres-base
   environment:
@@ -32,14 +32,14 @@ services:
     <<: *base
     environment:
     - DJANGO_SETTINGS_MODULE=settings.test_sqlite
-    entrypoint: python tests/runtests.py
+    entrypoint: python runtests.py
     depends_on:
     - memcached
     - memcached2
 
   sqlite-gis:
     <<: *base
-    entrypoint: python tests/runtests.py
+    entrypoint: python runtests.py
     environment:
     - DJANGO_SETTINGS_MODULE=settings.test_sqlite_gis
 
@@ -124,7 +124,7 @@ services:
     environment:
     - DJANGO_SETTINGS_MODULE=settings.test_oracle
     - WAIT_FOR=oracle-db:1521
-    entrypoint: /oracle_entrypoint.sh python tests/runtests.py
+    entrypoint: /oracle_entrypoint.sh python runtests.py
     depends_on:
     - oracle-db
     - memcached
