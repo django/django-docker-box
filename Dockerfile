@@ -12,6 +12,7 @@ RUN apt-get update \
           libenchant-2-2 \
           gettext \
           wget \
+          git \
     && apt-get clean
 
 RUN groupadd -r test && useradd --no-log-init -r -g test test
