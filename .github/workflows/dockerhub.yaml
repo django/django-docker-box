@@ -14,7 +14,12 @@ jobs:
         python-version: [3.8]
     steps:
       -
-        name: Check out the repo
+        name: Check out the docker repo
+        uses: actions/checkout@v3
+        with:
+          path: dockerdir
+      -
+        name: Check out the django repo
         uses: actions/checkout@v3
         with:
           repository: django/django
@@ -43,7 +48,7 @@ jobs:
         with:
           push: true
           context: djangodir
-          build-context: . 
+          file: dockerdir/Dockerfile
           build-args: PYTHON_VERSION=${{ matrix.python-version }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ matrix.python-version }}
