@@ -10,33 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compose-app: [sqlite, sqlite-gis, postgres, postgres-gis, mysql, mysql-gis, mariadb]
-        python-version: [3.8 ]
-        include:
-          - compose-app: postgres
-            python-version: 3.8
-            postgres-version: [12, 13, 14]
-          - compose-app: postgres-gis
-            python-version: 3.8
-            postgres-version: 12
-            postgis-version: 2.5
-          - compose-app: postgres-gis
-            python-version: 3.8
-            postgres-version: 13
-            postgis-version: 3.0
-          - compose-app: postgres-gis
-            python-version: 3.8
-            postgres-version: 14
-            postgis-version: 3.1
-          - compose-app: mysql
-            python-version: 3.8
-            mysql-version: [5.7, 8.0]
-          - compose-app: mysql-gis
-            python-version: 3.8
-            mysql-version: [5.7, 8.0]
-          - compose-app: mariadb
-            python-version: 3.8
-            mariadb-version: [10.4, 10.5, 10.6, 10.7, 10.8]
+        python-version: [3.8, 3.10]
     steps:
       -
         name: Set up QEMU
@@ -54,5 +28,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v3
         with:
-          push: true
-          tags: user/app:latest
+            context: .
+            push: true
+            build-args: ${{ matrix.python-version }}
+            tags: ${{ matrix.python-version }}
+
