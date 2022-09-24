@@ -18,7 +18,11 @@ Ensure that the `DJANGO_PATH` variable points to the root of the Django repo:
 
 If you see a docker-compose warning about it not being defined followed by an error ensure that is defined in the shell you are using.
 
-You need now build the image yourself:
+You can now either download the latest image used on the CI servers with the dependencies pre-installed:
+
+`docker-compose pull sqlite`
+
+Or build it yourself:
 
 `docker-compose build sqlite`
 
@@ -52,6 +56,10 @@ You can customize the version of the database you test against by changing the a
 The `PYTHON_VERSION` environment variable customizes which version of Python you are running the tests against. e.g:
 
 `PYTHON_VERSION=3.8 docker-compose run --rm sqlite`
+
+You can also pull the pre-built image in the same way:
+
+`PYTHON_VERSION=3.8 docker-compose pull sqlite`
 
 ## Oracle
 
