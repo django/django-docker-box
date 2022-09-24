@@ -13,6 +13,11 @@ jobs:
       matrix:
         python-version: [3.8]
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+          with:
+            repository: django/django
+            path: djangodir
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -36,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          context: djangodir
           build-args: PYTHON_VERSION=${{ matrix.python-version }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ matrix.python-version }}
