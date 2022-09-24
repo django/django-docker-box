@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ !!str '3.8', !!str '3.10']
+        python-version: 3.8
     steps:
       -
         name: Set up QEMU
