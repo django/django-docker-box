@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.10]
+        python-version: [ !!str '3.8', !!str '3.10']
     steps:
       -
         name: Set up QEMU
@@ -35,9 +35,8 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v3
         with:
-            context: .
-            push: true
-            build-args: ${{ matrix.python-version }}
-            labels: ${{ steps.meta.outputs.labels }}
-            tags: ${{ matrix.python-version }}
+          push: true
+          build-args: PYTHON_VERSION=${{ matrix.python-version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ matrix.python-version }}
 
