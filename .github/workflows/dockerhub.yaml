@@ -43,6 +43,7 @@ jobs:
         with:
           push: true
           context: djangodir
+          build-context: . 
           build-args: PYTHON_VERSION=${{ matrix.python-version }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ matrix.python-version }}
