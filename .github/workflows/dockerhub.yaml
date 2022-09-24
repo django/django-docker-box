@@ -51,5 +51,5 @@ jobs:
           file: dockerdir/Dockerfile
           build-args: PYTHON_VERSION=${{ matrix.python-version }}
           labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ matrix.python-version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/django-docker-box:${{ matrix.python-version }}
 
