@@ -13,6 +13,7 @@ RUN apt-get update \
           gettext \
           wget \
           git \
+          pkg-config \
     && apt-get clean
 
 RUN groupadd -r test && useradd --no-log-init -r -g test test
