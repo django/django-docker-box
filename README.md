@@ -14,7 +14,7 @@ Clone this repository and ensure you have docker and docker-compose installed.
 
 ### Environment
 
-You must set the `DJANGO_PATH` environment variable to the path of your local Django installation.
+You must set the `DJANGO_PATH` environment variable to the path of your local Django checkout.
 This can either be added to the `.env` file, or interactively set in your shell, like so:
 
 `export DJANGO_PATH=~/projects/django/`
