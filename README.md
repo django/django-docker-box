@@ -10,13 +10,26 @@ database versions, including Oracle.
 
 ## Quickstart
 
-Clone this repository somewhere. Also make sure you have docker and docker-compose installed.
+Clone this repository and ensure you have docker and docker-compose installed.
 
-Ensure that the `DJANGO_PATH` variable points to the root of the Django repo:
+### Environment
+
+You must set the `DJANGO_PATH` environment variable to the path of your local Django installation.
+This can either be added to the `.env` file, or interactively set in your shell, like so:
 
 `export DJANGO_PATH=~/projects/django/`
 
-If you see a docker-compose warning about it not being defined followed by an error ensure that is defined in the shell you are using.
+You must also check the `.env` file (in the root of this repository) and ensure that the versions
+of both Python and and database(s) you wish to test against are properly configured. For example,
+Django 5.0 requires Python 3.10 (or later) and PostgreSQL 13 (or later), so if you wish to
+test against Django 5.0 with PostgreSQL, an appropriate `.env` file may be:
+
+```env
+PYTHON_VERSION=3.10
+POSTGRES_VERSION=13
+```
+
+### Running tests
 
 You can now either download the latest image used on the CI servers with the dependencies pre-installed:
 
@@ -26,14 +39,14 @@ Or build it yourself:
 
 `docker-compose build sqlite`
 
-Then simply run:
+Then run the following command to test against SQLite:
 
 `docker-compose run --rm sqlite`
 
 All arguments are passed to `runtests.py`. Before they are run all specific dependencies are 
 installed (and cached across runs).
 
-## Different databases
+### Different databases
 
 Simply substitute `sqlite` for any supported database:
 
@@ -47,19 +60,16 @@ And if you're mad you can run all the tests for all databases in parallel:
 
 `docker-compose up`
 
-#### Database versions
+### Setting versions
 
-You can customize the version of the database you test against by changing the appropriate `[db]_VERSION` environment variable. See the Configuration section below for the available options and their defaults.
+For convenience, you may quickly change between Python and database versions by setting the
+appropriate environment variables inline, for example:
 
-## Different Python versions
+`PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose pull postgres`
 
-The `PYTHON_VERSION` environment variable customizes which version of Python you are running the tests against. e.g:
+Or run the following command to run the tests immediately:
 
-`PYTHON_VERSION=3.8 docker-compose run --rm sqlite`
-
-You can also pull the pre-built image in the same way:
-
-`PYTHON_VERSION=3.8 docker-compose pull sqlite`
+`PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose run --rm postgres`
 
 ## Oracle
 
@@ -101,7 +111,6 @@ To enter a bash shell within the container, run:
 | `POSTGRES_VERSION` | `12` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
 | `MARIADB_VERSION` | `10.4` | The mariadb version to use |
-
 
 ## Why?
 
