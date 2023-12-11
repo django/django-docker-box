@@ -55,11 +55,11 @@ You can customize the version of the database you test against by changing the a
 
 The `PYTHON_VERSION` environment variable customizes which version of Python you are running the tests against. e.g:
 
-`PYTHON_VERSION=3.8 docker-compose run --rm sqlite`
+`PYTHON_VERSION=3.10 docker-compose run --rm sqlite`
 
 You can also pull the pre-built image in the same way:
 
-`PYTHON_VERSION=3.8 docker-compose pull sqlite`
+`PYTHON_VERSION=3.10 docker-compose pull sqlite`
 
 ## Oracle
 
@@ -97,10 +97,10 @@ To enter a bash shell within the container, run:
 | Environment Variable | Default | Description |
 | --- | --- | --- |
 | `DJANGO_PATH` | None | The path to the Django codebase on your local machine |
-| `PYTHON_VERSION` | `3.8` | The python version to run tests against |
-| `POSTGRES_VERSION` | `12` | The version of Postgres to use |
+| `PYTHON_VERSION` | `3.10` | The python version to run tests against |
+| `POSTGRES_VERSION` | `13` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
-| `MARIADB_VERSION` | `10.4` | The mariadb version to use |
+| `MARIADB_VERSION` | `10.5` | The mariadb version to use |
 
 
 ## Why?
