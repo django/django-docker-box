@@ -4,19 +4,23 @@
 
 Run the django test suite across multiple databases.
 
-Inspired by [django-box](https://github.com/django/django-box) this project contains 
+Inspired by [django-box](https://github.com/django/django-box), this project contains 
 some compose definitions to quickly run the Django test suite across multiple Python and
 database versions, including Oracle.
 
 ## Quickstart
 
-Clone this repository somewhere. Also make sure you have docker and docker-compose installed.
+Clone this repository and ensure you have docker and docker-compose installed. If
+you are using Windows, see the [notes below](#usage-on-windows) before continuing.
 
-Ensure that the `DJANGO_PATH` variable points to the root of the Django repo:
+### Environment
+
+You must set the `DJANGO_PATH` environment variable to the path of your local Django checkout.
+This can either be added to the `.env` file, or interactively set in your shell, like so:
 
 `export DJANGO_PATH=~/projects/django/`
 
-If you see a docker-compose warning about it not being defined followed by an error ensure that is defined in the shell you are using.
+### Running tests
 
 You can now either download the latest image used on the CI servers with the dependencies pre-installed:
 
@@ -26,14 +30,14 @@ Or build it yourself:
 
 `docker-compose build sqlite`
 
-Then simply run:
+Then run the following command to test against SQLite:
 
 `docker-compose run --rm sqlite`
 
 All arguments are passed to `runtests.py`. Before they are run all specific dependencies are 
 installed (and cached across runs).
 
-## Different databases
+### Different databases
 
 Simply substitute `sqlite` for any supported database:
 
@@ -47,21 +51,43 @@ And if you're mad you can run all the tests for all databases in parallel:
 
 `docker-compose up`
 
-#### Database versions
+### Setting versions
 
-You can customize the version of the database you test against by changing the appropriate `[db]_VERSION` environment variable. See the Configuration section below for the available options and their defaults.
+A common source of issues is testing using a version of Python, or a database version,
+which is unsupported by your local Django checkout. The default versions set in the
+repository `.env` file should always reflect the minimum requirements of the latest
+development version of Django, however it is worth checking that these are correct
+if you are having trouble.
 
-## Different Python versions
+For convenience, you may quickly change between different Python and database versions
+by setting the appropriate environment variables inline, for example:
 
-The `PYTHON_VERSION` environment variable customizes which version of Python you are running the tests against. e.g:
+`PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose pull postgres`
 
-`PYTHON_VERSION=3.10 docker-compose run --rm sqlite`
+Or use the following command to run the tests immediately:
 
-You can also pull the pre-built image in the same way:
+`PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose run --rm postgres`
 
-`PYTHON_VERSION=3.10 docker-compose pull sqlite`
+## Usage on Windows
 
-## Oracle
+Some additional configuration is necessary to enable the use of this utility on Windows.
+The following environment variables will need to be added to the `.env` file in the
+repository root:
+
+* `PWD` set to the path of the root of this repository [^1]
+* `DOCKER_DEFAULT_PLATFORM=linux/amd64` [^2]
+
+For example:
+
+```env
+PWD=C:\Users\username\Projects\django-docker-box
+DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+[^1]: On Linux and macOS, but not of Windows, `PWD` refers to the local directory. 
+[^2]: `apt-get` does not work on Windows. Setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` enables the dependencies defined in the `Dockerfile` to be installed.
+
+## Testing against Oracle
 
 As usual Oracle is a bit more complex to set up. You need to download the latest `instantclient` **zip file**
 [from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the 
@@ -101,7 +127,6 @@ To enter a bash shell within the container, run:
 | `POSTGRES_VERSION` | `13` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
 | `MARIADB_VERSION` | `10.5` | The mariadb version to use |
-
 
 ## Why?
 
