@@ -10,7 +10,8 @@ database versions, including Oracle.
 
 ## Quickstart
 
-Clone this repository and ensure you have docker and docker-compose installed.
+Clone this repository and ensure you have docker and docker-compose installed. If
+you are using Windows, see the [notes below](#usage-on-windows) before continuing.
 
 ### Environment
 
@@ -18,16 +19,6 @@ You must set the `DJANGO_PATH` environment variable to the path of your local Dj
 This can either be added to the `.env` file, or interactively set in your shell, like so:
 
 `export DJANGO_PATH=~/projects/django/`
-
-You must also check the `.env` file (in the root of this repository) and ensure that the versions
-of both Python and and database(s) you wish to test against are properly configured. For example,
-Django 5.0 requires Python 3.10 (or later) and PostgreSQL 13 (or later), so if you wish to
-test against Django 5.0 with PostgreSQL, an appropriate `.env` file may be:
-
-```env
-PYTHON_VERSION=3.10
-POSTGRES_VERSION=13
-```
 
 ### Running tests
 
@@ -62,16 +53,41 @@ And if you're mad you can run all the tests for all databases in parallel:
 
 ### Setting versions
 
-For convenience, you may quickly change between Python and database versions by setting the
-appropriate environment variables inline, for example:
+A common source of issues is testing using a version of Python, or a database version,
+which is unsupported by your local Django checkout. The default versions set in the
+repository `.env` file should always reflect the minimum requirements of the latest
+development version of Django, however it is worth checking that these are correct
+if you are having trouble.
+
+For convenience, you may quickly change between different Python and database versions
+by setting the appropriate environment variables inline, for example:
 
 `PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose pull postgres`
 
-Or run the following command to run the tests immediately:
+Or use the following command to run the tests immediately:
 
 `PYTHON_VERSION=3.12 POSTGRES_VERSION=15 docker-compose run --rm postgres`
 
-## Oracle
+## Usage on Windows
+
+Some additional configuration is necessary to enable the use of this utility on Windows.
+The following environment variables will need to be added to the `.env` file in the
+repository root:
+
+* `PWD` set to the path of the root of this repository [^1]
+* `DOCKER_DEFAULT_PLATFORM=linux/amd64` [^2]
+
+For example:
+
+```env
+PWD=C:\Users\username\Projects\django-docker-box
+DOCKER_DEFAULT_PLATFORM=linux/amd64
+```
+
+[^1]: On Linux and macOS, but not of Windows, `PWD` refers to the local directory. 
+[^2]: `apt-get` does not work on Windows. Setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` enables the dependencies defined in the `Dockerfile` to be installed.
+
+## Testing against Oracle
 
 As usual Oracle is a bit more complex to set up. You need to download the latest `instantclient` **zip file**
 [from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the 
