@@ -32,6 +32,7 @@ RUN for f in /requirements/*.txt; do pip install -r $f; done && \
 RUN mkdir /tests && chown -R test:test /tests
 RUN mkdir /tests/results && chown -R test:test /tests/results/
 USER test:test
+ENV DJANGO_SETTINGS_MODULE=settings
 ENV PYTHONPATH "${PYTHONPATH}:/tests/django/"
 VOLUME /tests/django
 WORKDIR /tests/django/tests

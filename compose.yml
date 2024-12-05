@@ -9,7 +9,7 @@ x-base: &base
     - djangobox/django-docker-box:${PYTHON_VERSION}
   volumes:
   - ${DJANGO_PATH}:/tests/django/
-  - ./settings:/tests/django/tests/settings
+  - ./settings.py:/tests/django/tests/settings.py
   entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
 
 x-postgres-base: &postgres-base
@@ -26,7 +26,7 @@ services:
   sqlite:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_sqlite
+    - DATABASE_ENGINE=django.db.backends.sqlite3
     entrypoint: python runtests.py
     depends_on:
     - memcached
@@ -36,12 +36,13 @@ services:
     <<: *base
     entrypoint: python runtests.py
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_sqlite_gis
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
   postgres:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_postgres
+    - DATABASE_ENGINE=django.db.backends.postgresql
+    - DATABASE_HOST=postgres-db
     - WAIT_FOR=postgres-db:5432
     depends_on:
     - postgres-db
@@ -54,7 +55,8 @@ services:
   postgres-gis:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_postgres_gis
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
+    - DATABASE_HOST=postgres-gis-db
     - WAIT_FOR=postgres-gis-db:5432
     depends_on:
     - postgres-gis-db
@@ -65,7 +67,8 @@ services:
   mysql:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_mysql
+    - DATABASE_ENGINE=django.db.backends.mysql
+    - DATABASE_HOST=mysql-db
     - WAIT_FOR=mysql-db:3306
     depends_on:
     - mysql-db
@@ -85,7 +88,8 @@ services:
   mysql-gis:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_mysql_gis
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
+    - DATABASE_HOST=mysql-gis-db
     - WAIT_FOR=mysql-gis-db:3306
     depends_on:
     - mysql-gis-db
@@ -97,7 +101,8 @@ services:
   mariadb:
     <<: *base
     environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_mariadb
+    - DATABASE_ENGINE=django.db.backends.mysql
+    - DATABASE_HOST=mariadb-db
     - WAIT_FOR=mariadb-db:3306
     depends_on:
     - mariadb-db
@@ -134,6 +139,7 @@ services:
     <<: *base
     command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
     environment:
+    - DATABASE_ENGINE=django.db.backends.sqlite3
     - WAIT_FOR=chrome-browser:4444
     depends_on:
       - chrome-browser
@@ -147,6 +153,7 @@ services:
     <<: *base
     command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
     environment:
+    - DATABASE_ENGINE=django.db.backends.sqlite3
     - WAIT_FOR=firefox-browser:4444
     depends_on:
     - firefox-browser
