@@ -12,44 +12,45 @@ x-base: &base
   - ./settings.py:/tests/django/tests/settings.py
   entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
 
+x-mysql-base: &mysql-base
+  environment:
+  - MYSQL_ALLOW_EMPTY_PASSWORD=1
+  - MYSQL_DATABASE=django
+  - MYSQL_PASSWORD=django
+  - MYSQL_USER=django
+  tmpfs:
+  - /var/lib/mysql
+
 x-postgresql-base: &postgresql-base
   environment:
-  - POSTGRES_USER=django
-  - POSTGRES_PASSWORD=django
   - POSTGRES_DB=django
-  # Set a few options to speed up postgresql tests.
-  command: -c fsync=off -c synchronous_commit=off -c full_page_writes=off
+  - POSTGRES_PASSWORD=django
+  - POSTGRES_USER=django
   tmpfs:
   - /var/lib/postgresql
+  command: >-
+    -c fsync=off
+    -c full_page_writes=off
+    -c synchronous_commit=off
+
+x-memcached: &memcached-base
+  image: memcached:alpine
 
 services:
 
   # Services: Databases
 
   mariadb-db:
+    <<: *mysql-base
     image: mariadb:${MARIADB_VERSION}
-    tmpfs:
-    - /var/lib/mysql
-    environment:
-    - MYSQL_USER=django
-    - MYSQL_PASSWORD=django
-    - MYSQL_DATABASE=django
-    - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
-  mysql-db: &mysql_base
-    image: mysql:${MYSQL_VERSION}
-    tmpfs:
-    - /var/lib/mysql
-    environment:
-    - MYSQL_USER=django
-    - MYSQL_PASSWORD=django
-    - MYSQL_DATABASE=django
-    - MYSQL_ALLOW_EMPTY_PASSWORD=1
+  mysql-db:
+    <<: *mysql-base
+    image: &mysql-image mysql:${MYSQL_VERSION}
 
   mysql-gis-db:
-    <<: *mysql_base
-    volumes:
-    - /var/lib/mysql
+    <<: *mysql-base
+    image: *mysql-image
 
   postgresql-db:
     <<: *postgresql-base
@@ -61,11 +62,11 @@ services:
 
   # Services: Caches
 
-  memcached: &memcached
-    image: memcached:alpine
+  memcached:
+    <<: *memcached-base
 
   memcached2:
-    <<: *memcached
+    <<: *memcached-base
 
   # Services: Selenium
 
