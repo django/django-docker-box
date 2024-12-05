@@ -12,9 +12,6 @@ x-base: &base
   volumes:
   - ${DJANGO_PATH}:/tests/django/
   - ./settings:/tests/django/tests/settings
-  - ./oracle_entrypoint.sh:/oracle_entrypoint.sh
-  # Using yaml merging here overwrites the arrays. Simpler to just mount this in every service.
-  - ./oracle:/oracle
   entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
 
 x-postgres-base: &postgres-base
@@ -118,24 +115,6 @@ services:
     - MYSQL_DATABASE=django
     - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
-  oracle:
-    <<: *base
-    image: djangobox/django-docker-box:oracle-${PYTHON_VERSION}
-    environment:
-    - DJANGO_SETTINGS_MODULE=settings.test_oracle
-    - WAIT_FOR=oracle-db:1521
-    entrypoint: /oracle_entrypoint.sh python runtests.py
-    depends_on:
-    - oracle-db
-    - memcached
-    - memcached2
-  oracle-db:
-    image: sath89/oracle-12c
-    volumes:
-    - oracle:/u01/app/oracle/
-    environment:
-    - WEB_CONSOLE=false
-
   memcached: &memcached
     image: memcached:alpine
 
@@ -177,8 +156,3 @@ services:
     image: selenium/standalone-firefox
     volumes:
     - /dev/shm:/dev/shm
-
-
-volumes:
-  oracle:
-

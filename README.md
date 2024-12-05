@@ -55,23 +55,6 @@ You can also pull the pre-built image in the same way:
 
 `PYTHON_VERSION=3.10 docker-compose pull sqlite`
 
-## Oracle
-
-As usual Oracle is a bit more complex to set up. You need to download the latest `instantclient` **zip file**
-[from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the
-`./oracle` directory. Ensure only one `.zip` file is present.
-
-The database image is quite large (several gigabytes) and takes a fairly long time to initialise (5-10 minutes).
-Once it has initialised subsequent starts should be very quick. To begin this process run:
-
- `docker-compose run oracle-db`
-
-And wait for it to initialize. Once it has, use ctrl+c to terminate it and execute:
-
-`docker-compose run --rm oracle`
-
-To run the test suite against it. All other databases support different versions, however Oracle does not.
-
 ## Utilities
 
 To run the docs spellchecker:
