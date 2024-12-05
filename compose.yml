@@ -23,57 +23,19 @@ x-postgresql-base: &postgresql-base
   - /var/lib/postgresql
 
 services:
-  sqlite:
-    <<: *base
-    environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
-    entrypoint: python runtests.py
-    depends_on:
-    - memcached
-    - memcached2
 
-  sqlite-gis:
-    <<: *base
-    entrypoint: python runtests.py
-    environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
+  # Services: Databases
 
-  postgresql:
-    <<: *base
+  mariadb-db:
+    image: mariadb:${MARIADB_VERSION}
+    tmpfs:
+    - /var/lib/mysql
     environment:
-    - DATABASE_ENGINE=django.db.backends.postgresql
-    - DATABASE_HOST=postgresql-db
-    - WAIT_FOR=postgresql-db:5432
-    depends_on:
-    - postgresql-db
-    - memcached
-    - memcached2
-  postgresql-db:
-    <<: *postgresql-base
-    image: postgres:${POSTGRESQL_VERSION}-alpine
+    - MYSQL_USER=django
+    - MYSQL_PASSWORD=django
+    - MYSQL_DATABASE=django
+    - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
-  postgresql-gis:
-    <<: *base
-    environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
-    - DATABASE_HOST=postgresql-gis-db
-    - WAIT_FOR=postgresql-gis-db:5432
-    depends_on:
-    - postgresql-gis-db
-  postgresql-gis-db:
-    <<: *postgresql-base
-    image: postgis/postgis:${POSTGRESQL_VERSION}-${POSTGIS_VERSION}
-
-  mysql:
-    <<: *base
-    environment:
-    - DATABASE_ENGINE=django.db.backends.mysql
-    - DATABASE_HOST=mysql-db
-    - WAIT_FOR=mysql-db:3306
-    depends_on:
-    - mysql-db
-    - memcached
-    - memcached2
   mysql-db: &mysql_base
     image: mysql:${MYSQL_VERSION}
     entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
@@ -85,18 +47,40 @@ services:
     - MYSQL_DATABASE=django
     - MYSQL_ALLOW_EMPTY_PASSWORD=1
 
-  mysql-gis:
-    <<: *base
-    environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
-    - DATABASE_HOST=mysql-gis-db
-    - WAIT_FOR=mysql-gis-db:3306
-    depends_on:
-    - mysql-gis-db
   mysql-gis-db:
     <<: *mysql_base
     volumes:
     - /var/lib/mysql
+
+  postgresql-db:
+    <<: *postgresql-base
+    image: postgres:${POSTGRESQL_VERSION}-alpine
+
+  postgresql-gis-db:
+    <<: *postgresql-base
+    image: postgis/postgis:${POSTGRESQL_VERSION}-${POSTGIS_VERSION}-alpine
+
+  # Services: Caches
+
+  memcached: &memcached
+    image: memcached:alpine
+
+  memcached2:
+    <<: *memcached
+
+  # Services: Selenium
+
+  chrome-browser:
+    image: selenium/standalone-chrome
+    volumes:
+    - /dev/shm:/dev/shm
+
+  firefox-browser:
+    image: selenium/standalone-firefox
+    volumes:
+    - /dev/shm:/dev/shm
+
+  # Commands: Tests
 
   mariadb:
     <<: *base
@@ -108,21 +92,85 @@ services:
     - mariadb-db
     - memcached
     - memcached2
-  mariadb-db:
-    image: mariadb:${MARIADB_VERSION}
-    tmpfs:
-    - /var/lib/mysql
+
+  mysql:
+    <<: *base
     environment:
-    - MYSQL_USER=django
-    - MYSQL_PASSWORD=django
-    - MYSQL_DATABASE=django
-    - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    - DATABASE_ENGINE=django.db.backends.mysql
+    - DATABASE_HOST=mysql-db
+    - WAIT_FOR=mysql-db:3306
+    depends_on:
+    - mysql-db
+    - memcached
+    - memcached2
 
-  memcached: &memcached
-    image: memcached:alpine
+  postgresql:
+    <<: *base
+    environment:
+    - DATABASE_ENGINE=django.db.backends.postgresql
+    - DATABASE_HOST=postgresql-db
+    - WAIT_FOR=postgresql-db:5432
+    depends_on:
+    - postgresql-db
+    - memcached
+    - memcached2
 
-  memcached2:
-    <<: *memcached
+  sqlite:
+    <<: *base
+    environment:
+    - DATABASE_ENGINE=django.db.backends.sqlite3
+    entrypoint: python runtests.py
+    depends_on:
+    - memcached
+    - memcached2
+
+  # Commands: Tests: GIS
+
+  mysql-gis:
+    <<: *base
+    environment:
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
+    - DATABASE_HOST=mysql-gis-db
+    - WAIT_FOR=mysql-gis-db:3306
+    depends_on:
+    - mysql-gis-db
+
+  postgresql-gis:
+    <<: *base
+    environment:
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
+    - DATABASE_HOST=postgresql-gis-db
+    - WAIT_FOR=postgresql-gis-db:5432
+    depends_on:
+    - postgresql-gis-db
+
+  sqlite-gis:
+    <<: *base
+    entrypoint: python runtests.py
+    environment:
+    - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
+
+  # Commands: Tests: Selenium
+
+  chrome:
+    <<: *base
+    command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
+    environment:
+    - DATABASE_ENGINE=django.db.backends.sqlite3
+    - WAIT_FOR=chrome-browser:4444
+    depends_on:
+      - chrome-browser
+
+  firefox:
+    <<: *base
+    command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
+    environment:
+    - DATABASE_ENGINE=django.db.backends.sqlite3
+    - WAIT_FOR=firefox-browser:4444
+    depends_on:
+    - firefox-browser
+
+  # Commands: Other
 
   docs:
     <<: *base
@@ -133,31 +181,3 @@ services:
   flake8:
     <<: *base
     entrypoint: flake8
-
-  # Browser tests
-  chrome:
-    <<: *base
-    command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
-    environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
-    - WAIT_FOR=chrome-browser:4444
-    depends_on:
-      - chrome-browser
-  chrome-browser:
-    image: selenium/standalone-chrome
-    volumes:
-    - /dev/shm:/dev/shm
-
-  # Firefox tests fail on main
-  firefox:
-    <<: *base
-    command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
-    environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
-    - WAIT_FOR=firefox-browser:4444
-    depends_on:
-    - firefox-browser
-  firefox-browser:
-    image: selenium/standalone-firefox
-    volumes:
-    - /dev/shm:/dev/shm
