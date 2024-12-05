@@ -1,7 +1,5 @@
 # django-docker-box
 
-[![Build Status](https://travis-ci.org/django/django-docker-box.svg?branch=main)](https://travis-ci.org/django/django-docker-box)
-
 Run the django test suite across multiple databases.
 
 ## Quickstart
