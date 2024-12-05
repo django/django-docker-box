@@ -38,7 +38,6 @@ services:
 
   mysql-db: &mysql_base
     image: mysql:${MYSQL_VERSION}
-    entrypoint: ['/entrypoint.sh', '--default-authentication-plugin=mysql_native_password']
     tmpfs:
     - /var/lib/mysql
     environment:
