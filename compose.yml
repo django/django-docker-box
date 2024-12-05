@@ -2,7 +2,7 @@ x-base: &base
   image: djangobox/django-docker-box:${PYTHON_VERSION}
   build:
     context: ${DJANGO_PATH}
-    dockerfile: ${PWD}/Dockerfile
+    dockerfile: ${PWD}/Containerfile
     args:
     - PYTHON_VERSION=${PYTHON_VERSION}
     cache_from:
