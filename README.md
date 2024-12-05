@@ -4,10 +4,6 @@
 
 Run the django test suite across multiple databases.
 
-Inspired by [django-box](https://github.com/django/django-box) this project contains 
-some compose definitions to quickly run the Django test suite across multiple Python and
-database versions, including Oracle.
-
 ## Quickstart
 
 Clone this repository somewhere. Also make sure you have docker and docker-compose installed.
@@ -30,7 +26,7 @@ Then simply run:
 
 `docker-compose run --rm sqlite`
 
-All arguments are passed to `runtests.py`. Before they are run all specific dependencies are 
+All arguments are passed to `runtests.py`. Before they are run all specific dependencies are
 installed (and cached across runs).
 
 ## Different databases
@@ -64,12 +60,12 @@ You can also pull the pre-built image in the same way:
 ## Oracle
 
 As usual Oracle is a bit more complex to set up. You need to download the latest `instantclient` **zip file**
-[from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the 
+[from this page](https://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html) and place it inside the
 `./oracle` directory. Ensure only one `.zip` file is present.
 
-The database image is quite large (several gigabytes) and takes a fairly long time to initialise (5-10 minutes). 
+The database image is quite large (several gigabytes) and takes a fairly long time to initialise (5-10 minutes).
 Once it has initialised subsequent starts should be very quick. To begin this process run:
- 
+
  `docker-compose run oracle-db`
 
 And wait for it to initialize. Once it has, use ctrl+c to terminate it and execute:
@@ -101,10 +97,3 @@ To enter a bash shell within the container, run:
 | `POSTGRES_VERSION` | `13` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
 | `MARIADB_VERSION` | `10.5` | The mariadb version to use |
-
-
-## Why?
-
-I prefer using docker over Vagrant and virtualbox, which is what django-box uses. I think this 
-approach is also simpler to quickly change the various database/python versions the test suite 
-runs across. However both approaches work, so use whatever floats your boat.
