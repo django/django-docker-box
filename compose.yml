@@ -12,7 +12,7 @@ x-base: &base
   - ./settings.py:/tests/django/tests/settings.py
   entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
 
-x-postgres-base: &postgres-base
+x-postgresql-base: &postgresql-base
   environment:
   - POSTGRES_USER=django
   - POSTGRES_PASSWORD=django
@@ -38,31 +38,31 @@ services:
     environment:
     - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
-  postgres:
+  postgresql:
     <<: *base
     environment:
     - DATABASE_ENGINE=django.db.backends.postgresql
-    - DATABASE_HOST=postgres-db
-    - WAIT_FOR=postgres-db:5432
+    - DATABASE_HOST=postgresql-db
+    - WAIT_FOR=postgresql-db:5432
     depends_on:
-    - postgres-db
+    - postgresql-db
     - memcached
     - memcached2
-  postgres-db:
-    <<: *postgres-base
-    image: postgres:${POSTGRES_VERSION}-alpine
+  postgresql-db:
+    <<: *postgresql-base
+    image: postgres:${POSTGRESQL_VERSION}-alpine
 
-  postgres-gis:
+  postgresql-gis:
     <<: *base
     environment:
     - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
-    - DATABASE_HOST=postgres-gis-db
-    - WAIT_FOR=postgres-gis-db:5432
+    - DATABASE_HOST=postgresql-gis-db
+    - WAIT_FOR=postgresql-gis-db:5432
     depends_on:
-    - postgres-gis-db
-  postgres-gis-db:
-    <<: *postgres-base
-    image: postgis/postgis:${POSTGRES_VERSION}-${POSTGIS_VERSION}
+    - postgresql-gis-db
+  postgresql-gis-db:
+    <<: *postgresql-base
+    image: postgis/postgis:${POSTGRESQL_VERSION}-${POSTGIS_VERSION}
 
   mysql:
     <<: *base
