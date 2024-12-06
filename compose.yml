@@ -68,9 +68,9 @@ x-memcached: &memcached-base
     start_interval: 1s
 
 x-cache-depends: &depends-on-caches
-  memcached:
+  memcached-1:
     condition: service_healthy
-  memcached2:
+  memcached-2:
     condition: service_healthy
 
 services:
@@ -106,10 +106,10 @@ services:
 
   # Services: Caches
 
-  memcached:
+  memcached-1:
     <<: *memcached-base
 
-  memcached2:
+  memcached-2:
     <<: *memcached-base
 
   # Services: Selenium
