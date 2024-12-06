@@ -67,4 +67,4 @@ USE_TZ = False
 
 if os.environ.get("XUNIT", "0").lower() in {"1", "on", "true", "yes"}:
     TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
-    TEST_OUTPUT_DIR = "/tests/results"
+    TEST_OUTPUT_DIR = "/django/output/xunit"

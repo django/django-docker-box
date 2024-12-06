@@ -21,14 +21,14 @@ ENV PIP_NO_CACHE_DIR=off
 ENV PYTHONDONTWRITEBYTECODE=1
 RUN pip install --upgrade pip
 
-COPY --chown=test:test tests/requirements/ /requirements/
+COPY --chown=test:test --from=src tests/requirements/ /requirements/
 RUN for f in /requirements/*.txt; do pip install -r $f; done && \
     pip install flake8 flake8-isort sphinx pyenchant sphinxcontrib-spelling selenium unittest-xml-reporting
 
-RUN mkdir /tests && chown -R test:test /tests
-RUN mkdir /tests/results && chown -R test:test /tests/results/
+RUN mkdir --parents /django/{output,source} && chown --recursive test:test /django
 USER test:test
 ENV DJANGO_SETTINGS_MODULE=settings
-ENV PYTHONPATH "${PYTHONPATH}:/tests/django/"
-VOLUME /tests/django
-WORKDIR /tests/django/tests
+ENV PYTHONPATH="${PYTHONPATH}:/django/source/"
+VOLUME /django/output
+VOLUME /django/source
+WORKDIR /django/source/tests

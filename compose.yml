@@ -3,15 +3,18 @@
 x-base: &base
   image: djangobox/django-docker-box:${PYTHON_VERSION}
   build:
-    context: ${DJANGO_PATH}
+    context: .
     dockerfile: ${PWD}/Containerfile
     args:
       - PYTHON_VERSION=${PYTHON_VERSION}
     cache_from:
       - djangobox/django-docker-box:${PYTHON_VERSION}
+    additional_contexts:
+      src: ${DJANGO_PATH:-../django}
   volumes:
-    - ${DJANGO_PATH}:/tests/django/
-    - ./settings.py:/tests/django/tests/settings.py
+    - ${DJANGO_PATH:-../django}:/django/source:rw
+    - ./output:/django/output:rw
+    - ./settings.py:/django/source/tests/settings.py:ro
   entrypoint: python runtests.py
 
 x-mysql-base: &mysql-base
