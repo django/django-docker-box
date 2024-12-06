@@ -20,6 +20,9 @@ x-mysql-base: &mysql-base
   - MYSQL_USER=django
   tmpfs:
   - /var/lib/mysql
+  deploy:
+    mode: global
+  restart: unless-stopped
 
 x-postgresql-base: &postgresql-base
   environment:
@@ -28,6 +31,9 @@ x-postgresql-base: &postgresql-base
   - POSTGRES_USER=django
   tmpfs:
   - /var/lib/postgresql
+  deploy:
+    mode: global
+  restart: unless-stopped
   command: >-
     -c fsync=off
     -c full_page_writes=off
@@ -35,6 +41,9 @@ x-postgresql-base: &postgresql-base
 
 x-memcached: &memcached-base
   image: memcached:alpine
+  deploy:
+    mode: global
+  restart: unless-stopped
 
 services:
 
@@ -72,11 +81,17 @@ services:
 
   chrome-browser:
     image: selenium/standalone-chrome
+    deploy:
+      mode: global
+    restart: unless-stopped
     volumes:
     - /dev/shm:/dev/shm
 
   firefox-browser:
     image: selenium/standalone-firefox
+    deploy:
+      mode: global
+    restart: unless-stopped
     volumes:
     - /dev/shm:/dev/shm
 
