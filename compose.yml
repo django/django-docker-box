@@ -215,6 +215,10 @@ services:
     <<: *selenium-base
     image: selenium/node-chrome
 
+  selenium-edge:
+    <<: *selenium-base
+    image: selenium/node-edge
+
   selenium-firefox:
     <<: *selenium-base
     image: selenium/node-firefox
@@ -336,6 +340,20 @@ services:
       selenium-hub:
         condition: service_healthy
       selenium-chrome:
+        condition: service_started
+    environment:
+      - DATABASE_ENGINE=django.db.backends.sqlite3
+
+  edge:
+    <<: *base
+    entrypoint: >-
+      /django/entrypoint.bash
+      --selenium=edge
+      --selenium-hub=http://selenium-hub:4444/wd/hub
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+      selenium-edge:
         condition: service_started
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
