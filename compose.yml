@@ -1,25 +1,27 @@
+---
+
 x-base: &base
   image: djangobox/django-docker-box:${PYTHON_VERSION}
   build:
     context: ${DJANGO_PATH}
     dockerfile: ${PWD}/Containerfile
     args:
-    - PYTHON_VERSION=${PYTHON_VERSION}
+      - PYTHON_VERSION=${PYTHON_VERSION}
     cache_from:
-    - djangobox/django-docker-box:${PYTHON_VERSION}
+      - djangobox/django-docker-box:${PYTHON_VERSION}
   volumes:
-  - ${DJANGO_PATH}:/tests/django/
-  - ./settings.py:/tests/django/tests/settings.py
+    - ${DJANGO_PATH}:/tests/django/
+    - ./settings.py:/tests/django/tests/settings.py
   entrypoint: python runtests.py
 
 x-mysql-base: &mysql-base
   environment:
-  - MYSQL_ALLOW_EMPTY_PASSWORD=1
-  - MYSQL_DATABASE=django
-  - MYSQL_PASSWORD=django
-  - MYSQL_USER=django
+    - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    - MYSQL_DATABASE=django
+    - MYSQL_PASSWORD=django
+    - MYSQL_USER=django
   tmpfs:
-  - /var/lib/mysql
+    - /var/lib/mysql
   deploy:
     mode: global
   restart: unless-stopped
@@ -32,11 +34,11 @@ x-mysql-base: &mysql-base
 
 x-postgresql-base: &postgresql-base
   environment:
-  - POSTGRES_DB=django
-  - POSTGRES_PASSWORD=django
-  - POSTGRES_USER=django
+    - POSTGRES_DB=django
+    - POSTGRES_PASSWORD=django
+    - POSTGRES_USER=django
   tmpfs:
-  - /var/lib/postgresql
+    - /var/lib/postgresql
   deploy:
     mode: global
   restart: unless-stopped
@@ -118,7 +120,7 @@ services:
       mode: global
     restart: unless-stopped
     volumes:
-    - /dev/shm:/dev/shm
+      - /dev/shm:/dev/shm
 
   firefox-browser:
     image: selenium/standalone-firefox
@@ -126,7 +128,7 @@ services:
       mode: global
     restart: unless-stopped
     volumes:
-    - /dev/shm:/dev/shm
+      - /dev/shm:/dev/shm
 
   # Commands: Tests
 
@@ -137,8 +139,8 @@ services:
       mariadb-db:
         condition: service_healthy
     environment:
-    - DATABASE_ENGINE=django.db.backends.mysql
-    - DATABASE_HOST=mariadb-db
+      - DATABASE_ENGINE=django.db.backends.mysql
+      - DATABASE_HOST=mariadb-db
 
   mysql:
     <<: *base
@@ -147,8 +149,8 @@ services:
       mysql-db:
         condition: service_healthy
     environment:
-    - DATABASE_ENGINE=django.db.backends.mysql
-    - DATABASE_HOST=mysql-db
+      - DATABASE_ENGINE=django.db.backends.mysql
+      - DATABASE_HOST=mysql-db
 
   postgresql:
     <<: *base
@@ -157,15 +159,15 @@ services:
       postgresql-db:
         condition: service_healthy
     environment:
-    - DATABASE_ENGINE=django.db.backends.postgresql
-    - DATABASE_HOST=postgresql-db
+      - DATABASE_ENGINE=django.db.backends.postgresql
+      - DATABASE_HOST=postgresql-db
 
   sqlite:
     <<: *base
     depends_on:
       <<: *depends-on-caches
     environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
+      - DATABASE_ENGINE=django.db.backends.sqlite3
 
   # Commands: Tests: GIS
 
@@ -175,8 +177,8 @@ services:
       mysql-gis-db:
         condition: service_healthy
     environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
-    - DATABASE_HOST=mysql-gis-db
+      - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
+      - DATABASE_HOST=mysql-gis-db
 
   postgresql-gis:
     <<: *base
@@ -184,13 +186,13 @@ services:
       postgresql-gis-db:
         condition: service_healthy
     environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
-    - DATABASE_HOST=postgresql-gis-db
+      - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
+      - DATABASE_HOST=postgresql-gis-db
 
   sqlite-gis:
     <<: *base
     environment:
-    - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
+      - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
   # Commands: Tests: Selenium
 
@@ -198,7 +200,7 @@ services:
     <<: *base
     command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
     environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
+      - DATABASE_ENGINE=django.db.backends.sqlite3
     depends_on:
       - chrome-browser
 
@@ -206,9 +208,9 @@ services:
     <<: *base
     command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
     environment:
-    - DATABASE_ENGINE=django.db.backends.sqlite3
+      - DATABASE_ENGINE=django.db.backends.sqlite3
     depends_on:
-    - firefox-browser
+      - firefox-browser
 
   # Commands: Other
 
