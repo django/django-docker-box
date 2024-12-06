@@ -11,15 +11,11 @@ RUN apt-get update \
           unzip libaio1 \
           libenchant-2-2 \
           gettext \
-          wget \
           git \
           pkg-config \
     && apt-get clean
 
 RUN groupadd -r test && useradd --no-log-init -r -g test test
-
-RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /bin/wait-for-it.sh \
-    && chmod a+x /bin/wait-for-it.sh
 
 ENV PIP_NO_CACHE_DIR=off
 ENV PYTHONDONTWRITEBYTECODE=1

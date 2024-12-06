@@ -10,7 +10,7 @@ x-base: &base
   volumes:
   - ${DJANGO_PATH}:/tests/django/
   - ./settings.py:/tests/django/tests/settings.py
-  entrypoint: bash -c "wait-for-it.sh -s -t 20 $${WAIT_FOR} -- python runtests.py $$@" --
+  entrypoint: python runtests.py
 
 x-mysql-base: &mysql-base
   environment:
@@ -23,6 +23,12 @@ x-mysql-base: &mysql-base
   deploy:
     mode: global
   restart: unless-stopped
+  healthcheck: &mysql-base-healthcheck
+    interval: 5s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+    start_interval: 1s
 
 x-postgresql-base: &postgresql-base
   environment:
@@ -34,6 +40,13 @@ x-postgresql-base: &postgresql-base
   deploy:
     mode: global
   restart: unless-stopped
+  healthcheck:
+    test: pg_isready --quiet --username=django
+    interval: 5s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+    start_interval: 1s
   command: >-
     -c fsync=off
     -c full_page_writes=off
@@ -44,6 +57,19 @@ x-memcached: &memcached-base
   deploy:
     mode: global
   restart: unless-stopped
+  healthcheck:
+    test: echo stats | nc 127.0.0.1 11211
+    interval: 5s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+    start_interval: 1s
+
+x-cache-depends: &depends-on-caches
+  memcached:
+    condition: service_healthy
+  memcached2:
+    condition: service_healthy
 
 services:
 
@@ -52,14 +78,21 @@ services:
   mariadb-db:
     <<: *mysql-base
     image: mariadb:${MARIADB_VERSION}
+    healthcheck:
+      <<: *mysql-base-healthcheck
+      test: healthcheck.sh --connect
 
   mysql-db:
     <<: *mysql-base
     image: &mysql-image mysql:${MYSQL_VERSION}
+    healthcheck: &mysql-healthcheck
+      <<: *mysql-base-healthcheck
+      test: mysqladmin ping --silent
 
   mysql-gis-db:
     <<: *mysql-base
     image: *mysql-image
+    healthcheck: *mysql-healthcheck
 
   postgresql-db:
     <<: *postgresql-base
@@ -99,69 +132,63 @@ services:
 
   mariadb:
     <<: *base
+    depends_on:
+      <<: *depends-on-caches
+      mariadb-db:
+        condition: service_healthy
     environment:
     - DATABASE_ENGINE=django.db.backends.mysql
     - DATABASE_HOST=mariadb-db
-    - WAIT_FOR=mariadb-db:3306
-    depends_on:
-    - mariadb-db
-    - memcached
-    - memcached2
 
   mysql:
     <<: *base
+    depends_on:
+      <<: *depends-on-caches
+      mysql-db:
+        condition: service_healthy
     environment:
     - DATABASE_ENGINE=django.db.backends.mysql
     - DATABASE_HOST=mysql-db
-    - WAIT_FOR=mysql-db:3306
-    depends_on:
-    - mysql-db
-    - memcached
-    - memcached2
 
   postgresql:
     <<: *base
+    depends_on:
+      <<: *depends-on-caches
+      postgresql-db:
+        condition: service_healthy
     environment:
     - DATABASE_ENGINE=django.db.backends.postgresql
     - DATABASE_HOST=postgresql-db
-    - WAIT_FOR=postgresql-db:5432
-    depends_on:
-    - postgresql-db
-    - memcached
-    - memcached2
 
   sqlite:
     <<: *base
+    depends_on:
+      <<: *depends-on-caches
     environment:
     - DATABASE_ENGINE=django.db.backends.sqlite3
-    entrypoint: python runtests.py
-    depends_on:
-    - memcached
-    - memcached2
 
   # Commands: Tests: GIS
 
   mysql-gis:
     <<: *base
+    depends_on:
+      mysql-gis-db:
+        condition: service_healthy
     environment:
     - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
     - DATABASE_HOST=mysql-gis-db
-    - WAIT_FOR=mysql-gis-db:3306
-    depends_on:
-    - mysql-gis-db
 
   postgresql-gis:
     <<: *base
+    depends_on:
+      postgresql-gis-db:
+        condition: service_healthy
     environment:
     - DATABASE_ENGINE=django.contrib.gis.db.backends.postgis
     - DATABASE_HOST=postgresql-gis-db
-    - WAIT_FOR=postgresql-gis-db:5432
-    depends_on:
-    - postgresql-gis-db
 
   sqlite-gis:
     <<: *base
-    entrypoint: python runtests.py
     environment:
     - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
@@ -172,7 +199,6 @@ services:
     command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
     environment:
     - DATABASE_ENGINE=django.db.backends.sqlite3
-    - WAIT_FOR=chrome-browser:4444
     depends_on:
       - chrome-browser
 
@@ -181,7 +207,6 @@ services:
     command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
     environment:
     - DATABASE_ENGINE=django.db.backends.sqlite3
-    - WAIT_FOR=firefox-browser:4444
     depends_on:
     - firefox-browser
 
