@@ -48,6 +48,11 @@ CACHES = {
         "LOCATION": "memcached-2:11211",
         "KEY_PREFIX": "pylibmc:",
     },
+    "redis-py": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis:6379",
+        "KEY_PREFIX": "redis:",
+    },
 }
 
 DATABASES = _build_databases_setting()

@@ -97,10 +97,25 @@ x-memcached: &memcached-base
     --memory-limit=64
     --threads=4
 
+x-redis: &redis-base
+  image: redis:alpine
+  deploy:
+    mode: global
+  restart: unless-stopped
+  healthcheck:
+    test: redis-cli ping | grep -i pong
+    interval: 5s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+    start_interval: 1s
+
 x-cache-depends: &depends-on-caches
   memcached-1:
     condition: service_healthy
   memcached-2:
+    condition: service_healthy
+  redis:
     condition: service_healthy
 
 x-selenium-base: &selenium-base
@@ -190,6 +205,9 @@ services:
 
   memcached-2:
     <<: *memcached-base
+
+  redis:
+    <<: *redis-base
 
   # Services: Selenium
 
