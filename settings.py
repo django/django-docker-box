@@ -4,6 +4,7 @@ import os
 def _build_databases_setting():
     engine = os.environ["DATABASE_ENGINE"]
     host = os.environ.get("DATABASE_HOST", "")
+    name = os.environ.get("DATABASE_NAME", "")
     settings = {}
 
     for n, alias in enumerate(("default", "other"), start=1):
@@ -19,6 +20,16 @@ def _build_databases_setting():
 
         if engine.endswith(".mysql"):
             entry["TEST"] = {"CHARSET": "utf8"}
+
+        if engine.endswith(".oracle"):
+            entry |= {
+                "NAME": name,
+                "TEST": {
+                    "USER": f"{alias}_test",
+                    "TBLSPACE": f"{alias}_test_tbls",
+                    "TBLSPACE_TMP": f"{alias}_test_tbls_tmp",
+                },
+            }
 
     return settings
 

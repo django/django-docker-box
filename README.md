@@ -78,3 +78,4 @@ To enter a bash shell within the container, run:
 | `POSTGRESQL_VERSION` | `13` | The version of Postgres to use |
 | `MYSQL_VERSION` | `8` | The mysql version to use |
 | `MARIADB_VERSION` | `10.5` | The mariadb version to use |
+| `ORACLE_VERSION` | `23.5.0.0` | The Oracle version to use |

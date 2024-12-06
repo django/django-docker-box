@@ -34,6 +34,22 @@ x-mysql-base: &mysql-base
   volumes:
     - ./startup-mysql.sql:/docker-entrypoint-initdb.d/django.sql:ro
 
+x-oracle-base: &oracle-base
+  environment:
+    - ORACLE_PWD=oracle
+  deploy:
+    mode: global
+  restart: unless-stopped
+  healthcheck:
+    test: /opt/oracle/checkDBStatus.sh
+    interval: 5s
+    timeout: 5s
+    retries: 3
+    start_period: 10s
+    start_interval: 1s
+  volumes:
+    - ./startup-oracle.sql:/opt/oracle/scripts/startup/django.sql:ro
+
 x-postgresql-base: &postgresql-base
   environment:
     - POSTGRES_DB=django
@@ -144,6 +160,15 @@ services:
     command: *mysql-command
     healthcheck: *mysql-healthcheck
 
+  oracle-db:
+    <<: *oracle-base
+    # yamllint disable-line rule:line-length
+    image: &oracle-image container-registry.oracle.com/database/free:${ORACLE_VERSION}-lite
+
+  oracle-gis-db:
+    <<: *oracle-base
+    image: *oracle-image
+
   postgresql-db:
     <<: *postgresql-base
     image: postgres:${POSTGRESQL_VERSION}-alpine
@@ -205,6 +230,16 @@ services:
       - DATABASE_ENGINE=django.db.backends.mysql
       - DATABASE_HOST=mysql-db
 
+  oracle:
+    <<: *base
+    depends_on:
+      <<: *depends-on-caches
+      oracle-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_ENGINE=django.db.backends.oracle
+      - DATABASE_NAME=oracle-db:1521/freepdb1
+
   postgresql:
     <<: *base
     depends_on:
@@ -232,6 +267,15 @@ services:
     environment:
       - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
       - DATABASE_HOST=mysql-gis-db
+
+  oracle-gis:
+    <<: *base
+    depends_on:
+      oracle-gis-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_ENGINE=django.contrib.gis.db.backends.oracle
+      - DATABASE_NAME=oracle-gis-db:1521/freepdb1
 
   postgresql-gis:
     <<: *base
