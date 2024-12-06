@@ -38,6 +38,8 @@ RUN --mount=type=cache,target=/root/.cache/uv <<EOF
     uv pip install --requirement=/django/requirements.txt --system
 EOF
 
+COPY --chown=django:django entrypoint.bash /django/
+
 SHELL ["/bin/bash", "-c"]
 
 ENV DJANGO_SETTINGS_MODULE=settings
@@ -46,4 +48,4 @@ USER django:django
 VOLUME /django/output
 VOLUME /django/source
 WORKDIR /django/source/tests
-ENTRYPOINT ["python runtests.py"]
+ENTRYPOINT ["/django/entrypoint.bash"]
