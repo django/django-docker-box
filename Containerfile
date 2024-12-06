@@ -29,12 +29,13 @@ EOF
 COPY --chown=django:django requirements.txt /django/requirements/extra.txt
 COPY --chown=django:django --from=src tests/requirements/ /django/requirements/
 COPY --chown=django:django --from=src docs/requirements.txt /django/requirements/docs.txt
-RUN --mount=type=cache,target=/root/.cache/pip <<EOF
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+RUN --mount=type=cache,target=/root/.cache/uv <<EOF
     cat /django/requirements/*.txt \
         | grep --invert-match '^#' \
         | sort --unique --version-sort \
         | tee /django/requirements.txt
-    pip install --requirement=/django/requirements.txt
+    uv pip install --requirement=/django/requirements.txt --system
 EOF
 
 SHELL ["/bin/bash", "-c"]
