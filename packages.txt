@@ -1,0 +1,17 @@
+binutils
+build-essential
+default-libmysqlclient-dev
+default-mysql-client
+gdal-bin
+gettext
+git
+libaio1
+libenchant-2-2
+libgdal28
+libgeoip1
+libmemcached-dev
+libpq-dev
+libproj-dev
+libsqlite3-mod-spatialite
+pkg-config
+unzip
