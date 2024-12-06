@@ -1,26 +1,48 @@
-ARG PYTHON_VERSION
+# syntax=docker/dockerfile:1.12
+
+ARG PYTHON_VERSION=3.10
 FROM python:${PYTHON_VERSION}-slim-bullseye
 
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Create user and prepare directories.
+RUN <<EOF
+    useradd --no-create-home --no-log-init django
+    mkdir --parents /django/{output,source}
+    chown --recursive django:django /django
+EOF
+
+# Install system dependencies from package manager.
 COPY --chown=django:django packages.txt /django/
-RUN apt-get update \
-    && xargs --arg-file=/django/packages.txt apt-get install --no-install-recommends -y \
-    && apt-get clean
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked <<EOF
+    rm --force /etc/apt/apt.conf.d/docker-clean
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+    apt-get update --quiet --yes
+    xargs --arg-file=/django/packages.txt apt-get install --no-install-recommends --yes
+EOF
 
-RUN groupadd -r django && useradd --no-log-init -r -g django django
-
-ENV PIP_NO_CACHE_DIR=off
-ENV PYTHONDONTWRITEBYTECODE=1
-RUN pip install --upgrade pip
-
+# Install all Python requirements in a single command.
 COPY --chown=django:django requirements.txt /django/requirements/extra.txt
 COPY --chown=django:django --from=src tests/requirements/ /django/requirements/
 COPY --chown=django:django --from=src docs/requirements.txt /django/requirements/docs.txt
-RUN for f in /django/requirements/*.txt; do pip install -r $f; done
+RUN --mount=type=cache,target=/root/.cache/pip <<EOF
+    cat /django/requirements/*.txt \
+        | grep --invert-match '^#' \
+        | sort --unique --version-sort \
+        | tee /django/requirements.txt
+    pip install --requirement=/django/requirements.txt
+EOF
 
-RUN mkdir --parents /django/{output,source} && chown --recursive django:django /django
-USER django:django
+SHELL ["/bin/bash", "-c"]
+
 ENV DJANGO_SETTINGS_MODULE=settings
 ENV PYTHONPATH="${PYTHONPATH}:/django/source/"
+USER django:django
 VOLUME /django/output
 VOLUME /django/source
 WORKDIR /django/source/tests
+ENTRYPOINT ["python runtests.py"]

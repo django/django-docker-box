@@ -15,7 +15,6 @@ x-base: &base
     - ${DJANGO_PATH:-../django}:/django/source:rw
     - ./output:/django/output:rw
     - ./settings.py:/django/source/tests/settings.py:ro
-  entrypoint: python runtests.py
 
 x-mysql-base: &mysql-base
   environment:
