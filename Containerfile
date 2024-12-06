@@ -25,8 +25,8 @@ ENV TERM="xterm-256color"
 
 # Create user and prepare directories.
 RUN <<EOF
-    useradd --no-create-home --no-log-init django
-    mkdir --parents /django/{output,source}
+    useradd --home-dir=/django --no-create-home --no-log-init django
+    mkdir --parents /django/{.cache,output,source}
     chown --recursive django:django /django
 EOF
 

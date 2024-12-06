@@ -16,6 +16,7 @@ x-base: &base
     - ${DJANGO_PATH:-../django}:/django/source:rw
     - ./output:/django/output:rw
     - ./settings.py:/django/source/tests/settings.py:ro
+    - user-cache:/django/.cache/:rw
 
 x-mysql-base: &mysql-base
   environment:
@@ -134,6 +135,9 @@ x-selenium-base: &selenium-base
   deploy:
     mode: global
   restart: unless-stopped
+
+volumes:
+  user-cache:
 
 services:
 
@@ -389,6 +393,11 @@ services:
     working_dir: /tests/django/docs
     user: root
 
-  flake8:
+  pre-commit:
     <<: *base
-    entrypoint: flake8
+    entrypoint: pre-commit run --all-files
+    working_dir: /django/source
+    environment:
+      # XXX: Disable eslint due to issues finding dependencies.
+      #      See https://github.com/django/django/pull/18162
+      SKIP: eslint

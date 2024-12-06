@@ -61,9 +61,9 @@ To run the docs spellchecker:
 
 `docker-compose run --rm docs`
 
-Or flake8:
+Or pre-commit:
 
-`docker-compose run --rm flake8`
+`docker-compose run --rm pre-commit`
 
 To enter a bash shell within the container, run:
 
