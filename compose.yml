@@ -31,6 +31,8 @@ x-mysql-base: &mysql-base
     retries: 3
     start_period: 10s
     start_interval: 1s
+  volumes:
+    - ./startup-mysql.sql:/docker-entrypoint-initdb.d/django.sql:ro
 
 x-postgresql-base: &postgresql-base
   environment:

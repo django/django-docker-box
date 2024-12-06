@@ -18,11 +18,7 @@ def _build_databases_setting():
             }
 
         if engine.endswith(".mysql"):
-            entry |= {
-                "USER": "root",
-                "PASSWORD": "",
-                "TEST": {"CHARSET": "utf8"},
-            }
+            entry["TEST"] = {"CHARSET": "utf8"}
 
     return settings
 
