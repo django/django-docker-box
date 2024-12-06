@@ -123,8 +123,8 @@ services:
 
   mariadb-db:
     <<: *mysql-base
-    image: mariadb:${MARIADB_VERSION}
-    command: >-
+    image: &mariadb-image mariadb:${MARIADB_VERSION}
+    command: &mariadb-command >-
       --innodb-fast-shutdown=3
       --innodb-flush-log-at-trx-commit=0
       --innodb-flush-method=nosync
@@ -134,9 +134,15 @@ services:
       --skip-innodb-flush-sync
       --skip-innodb-use-atomic-writes
       --skip-name-resolve
-    healthcheck:
+    healthcheck: &mariadb-healthcheck
       <<: *mysql-base-healthcheck
       test: healthcheck.sh --connect
+
+  mariadb-gis-db:
+    <<: *mysql-base
+    image: *mariadb-image
+    command: *mariadb-command
+    healthcheck: *mariadb-healthcheck
 
   mysql-db:
     <<: *mysql-base
@@ -258,6 +264,15 @@ services:
       - DATABASE_ENGINE=django.db.backends.sqlite3
 
   # Commands: Tests: GIS
+
+  mariadb-gis:
+    <<: *base
+    depends_on:
+      mariadb-gis-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_ENGINE=django.contrib.gis.db.backends.mysql
+      - DATABASE_HOST=mariadb-gis-db
 
   mysql-gis:
     <<: *base
