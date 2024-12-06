@@ -3,6 +3,15 @@
 ARG PYTHON_VERSION=3.10
 FROM python:${PYTHON_VERSION}-slim-bullseye
 
+LABEL org.opencontainers.image.authors="Django Software Foundation"
+LABEL org.opencontainers.image.url="https://github.com/django/django-docker-box"
+LABEL org.opencontainers.image.documentation="https://github.com/django/django-docker-box"
+LABEL org.opencontainers.image.source="https://github.com/django/django-docker-box"
+LABEL org.opencontainers.image.vendor="Django Software Foundation"
+LABEL org.opencontainers.image.licenses="BSD-3-Clause"
+LABEL org.opencontainers.image.title="Django Docker Box"
+LABEL org.opencontainers.image.description="Container image for developing and testing Django."
+
 SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
 
 ENV DEBIAN_FRONTEND=noninteractive
