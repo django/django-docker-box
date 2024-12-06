@@ -52,9 +52,17 @@ x-postgresql-base: &postgresql-base
     start_period: 10s
     start_interval: 1s
   command: >-
+    -c archive_mode=off
+    -c checkpoint_completion_target=0.9
+    -c checkpoint_timeout=900
     -c fsync=off
     -c full_page_writes=off
+    -c max_replication_slots=0
+    -c max_wal_senders=0
+    -c max_wal_size=4096
     -c synchronous_commit=off
+    -c wal_level=minimal
+  # 13+: -c wal_keep_size=0
 
 x-memcached: &memcached-base
   image: memcached:alpine
@@ -68,6 +76,10 @@ x-memcached: &memcached-base
     retries: 3
     start_period: 10s
     start_interval: 1s
+  command: >-
+    --conn-limit=1024
+    --memory-limit=64
+    --threads=4
 
 x-cache-depends: &depends-on-caches
   memcached-1:
@@ -96,6 +108,16 @@ services:
   mariadb-db:
     <<: *mysql-base
     image: mariadb:${MARIADB_VERSION}
+    command: >-
+      --innodb-fast-shutdown=3
+      --innodb-flush-log-at-trx-commit=0
+      --innodb-flush-method=nosync
+      --innodb-random-read-ahead
+      --skip-innodb-doublewrite
+      --skip-innodb-file-per-table
+      --skip-innodb-flush-sync
+      --skip-innodb-use-atomic-writes
+      --skip-name-resolve
     healthcheck:
       <<: *mysql-base-healthcheck
       test: healthcheck.sh --connect
@@ -103,6 +125,15 @@ services:
   mysql-db:
     <<: *mysql-base
     image: &mysql-image mysql:${MYSQL_VERSION}
+    command: &mysql-command >-
+      --innodb-flush-log-at-trx-commit=0
+      --innodb-flush-method=nosync
+      --innodb-random-read-ahead
+      --skip-innodb-doublewrite
+      --skip-innodb-extend-and-initialize
+      --skip-innodb-file-per-table
+      --skip-innodb-flush-sync
+      --skip-name-resolve
     healthcheck: &mysql-healthcheck
       <<: *mysql-base-healthcheck
       test: mysqladmin ping --silent
@@ -110,6 +141,7 @@ services:
   mysql-gis-db:
     <<: *mysql-base
     image: *mysql-image
+    command: *mysql-command
     healthcheck: *mysql-healthcheck
 
   postgresql-db:
