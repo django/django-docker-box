@@ -75,6 +75,20 @@ x-cache-depends: &depends-on-caches
   memcached-2:
     condition: service_healthy
 
+x-selenium-base: &selenium-base
+  shm_size: 2gb
+  environment:
+    - SE_EVENT_BUS_HOST=selenium-hub
+    - SE_EVENT_BUS_PUBLISH_PORT=4442
+    - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    - SE_NODE_GRID_URL=http://selenium-hub:4444
+  depends_on:
+    selenium-hub:
+      condition: service_started
+  deploy:
+    mode: global
+  restart: unless-stopped
+
 services:
 
   # Services: Databases
@@ -116,21 +130,26 @@ services:
 
   # Services: Selenium
 
-  chrome-browser:
-    image: selenium/standalone-chrome
-    deploy:
-      mode: global
-    restart: unless-stopped
-    volumes:
-      - /dev/shm:/dev/shm
+  selenium-chrome:
+    <<: *selenium-base
+    image: selenium/node-chrome
 
-  firefox-browser:
-    image: selenium/standalone-firefox
+  selenium-firefox:
+    <<: *selenium-base
+    image: selenium/node-firefox
+
+  selenium-hub:
+    image: selenium/hub
+    ports:
+      - "4442-4444:4442-4444"
     deploy:
       mode: global
     restart: unless-stopped
-    volumes:
-      - /dev/shm:/dev/shm
+    healthcheck:
+      test: /opt/bin/check-grid.sh
+      interval: 15s
+      timeout: 30s
+      retries: 5
 
   # Commands: Tests
 
@@ -200,19 +219,31 @@ services:
 
   chrome:
     <<: *base
-    command: --selenium=chrome --selenium-hub=http://chrome-browser:4444/wd/hub
+    entrypoint: >-
+      /django/entrypoint.bash
+      --selenium=chrome
+      --selenium-hub=http://selenium-hub:4444/wd/hub
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+      selenium-chrome:
+        condition: service_started
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
-    depends_on:
-      - chrome-browser
 
   firefox:
     <<: *base
-    command: --selenium=firefox --selenium-hub=http://firefox-browser:4444/wd/hub
+    entrypoint: >-
+      /django/entrypoint.bash
+      --selenium=firefox
+      --selenium-hub=http://selenium-hub:4444/wd/hub
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+      selenium-firefox:
+        condition: service_started
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
-    depends_on:
-      - firefox-browser
 
   # Commands: Other
 
