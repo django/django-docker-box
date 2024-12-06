@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1.12
 
+ARG PYTHON_IMPLEMENTATION=python
 ARG PYTHON_VERSION=3.10
-FROM python:${PYTHON_VERSION}-slim-bookworm
+FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-bookworm
 
 LABEL org.opencontainers.image.authors="Django Software Foundation"
 LABEL org.opencontainers.image.url="https://github.com/django/django-docker-box"

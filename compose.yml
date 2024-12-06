@@ -1,14 +1,15 @@
 ---
 
 x-base: &base
-  image: djangobox/django-docker-box:${PYTHON_VERSION}
+  image: djangobox/django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
   build:
     context: .
     dockerfile: ${PWD}/Containerfile
     args:
+      - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
       - PYTHON_VERSION=${PYTHON_VERSION}
     cache_from:
-      - djangobox/django-docker-box:${PYTHON_VERSION}
+      - djangobox/django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
     additional_contexts:
       src: ${DJANGO_PATH:-../django}
   volumes:
