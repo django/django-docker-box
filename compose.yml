@@ -385,12 +385,6 @@ services:
 
   # Commands: Other
 
-  docs:
-    <<: *base
-    entrypoint: ["make", "spelling"]
-    working_dir: /tests/django/docs
-    user: root
-
   pre-commit:
     <<: *base
     entrypoint: pre-commit run --all-files
@@ -399,3 +393,10 @@ services:
       # XXX: Disable eslint due to issues finding dependencies.
       #      See https://github.com/django/django/pull/18162
       SKIP: eslint
+
+  sphinx:
+    <<: *base
+    entrypoint: make
+    working_dir: /django/source/docs
+    environment:
+      BUILDDIR: /django/output/docs
