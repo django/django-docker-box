@@ -19,7 +19,7 @@ def _build_databases_setting():
             }
 
         if engine.endswith(".mysql"):
-            entry["TEST"] = {"CHARSET": "utf8"}
+            entry["TEST"] = {"CHARSET": "utf8mb4"}
 
         if engine.endswith(".oracle"):
             entry |= {
