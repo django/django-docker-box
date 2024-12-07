@@ -1,1 +1,4 @@
+__pycache__/
 .idea/
+.mypy_cache/
+.ruff_cache/
