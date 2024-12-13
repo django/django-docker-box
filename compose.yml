@@ -290,6 +290,7 @@ services:
   mariadb-gis:
     <<: *base
     depends_on:
+      <<: *depends-on-caches
       mariadb-gis-db:
         condition: service_healthy
     environment:
@@ -299,6 +300,7 @@ services:
   mysql-gis:
     <<: *base
     depends_on:
+      <<: *depends-on-caches
       mysql-gis-db:
         condition: service_healthy
     environment:
@@ -308,6 +310,7 @@ services:
   oracle-gis:
     <<: *base
     depends_on:
+      <<: *depends-on-caches
       oracle-gis-db:
         condition: service_healthy
     environment:
@@ -317,6 +320,7 @@ services:
   postgresql-gis:
     <<: *base
     depends_on:
+      <<: *depends-on-caches
       postgresql-gis-db:
         condition: service_healthy
     environment:
@@ -325,6 +329,8 @@ services:
 
   sqlite-gis:
     <<: *base
+    depends_on:
+      <<: *depends-on-caches
     environment:
       - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
