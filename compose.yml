@@ -4,7 +4,7 @@ x-base: &base
   image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
   build:
     context: .
-    dockerfile: ${PWD}/Containerfile
+    dockerfile: ./Containerfile
     args:
       - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
       - PYTHON_VERSION=${PYTHON_VERSION}
