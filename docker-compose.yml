@@ -1,5 +1,3 @@
-version: "2.3"
-
 x-base: &base
   image: djangobox/django-docker-box:${PYTHON_VERSION}
   build:
