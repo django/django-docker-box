@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.12
 
 ARG PYTHON_IMPLEMENTATION=python
-ARG PYTHON_VERSION=3.10
+ARG PYTHON_VERSION=3.12
 FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-bookworm
 
 LABEL org.opencontainers.image.authors="Django Software Foundation"
