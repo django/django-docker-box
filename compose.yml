@@ -305,7 +305,11 @@ services:
             cd /tmp/sqlite
             ./configure
             make
-            cp .libs/libsqlite3.so /tmp/
+            if [ -f libsqlite3.so ]; then
+              cp libsqlite3.so /tmp/
+            else
+              cp .libs/libsqlite3.so /tmp/
+            fi
             rm -rf /tmp/sqlite
           fi
         EOF
