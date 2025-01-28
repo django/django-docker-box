@@ -8,7 +8,7 @@ x-base: &base
     args:
       - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
       - PYTHON_VERSION=${PYTHON_VERSION}
-    additional_contexts:
+    additional_contexts: &additional-contexts
       src: ${DJANGO_PATH:-../django}
   volumes:
     - ${DJANGO_PATH:-../django}:/django/source:rw
@@ -81,6 +81,36 @@ x-postgresql-base: &postgresql-base
     -c synchronous_commit=off
     -c wal_level=minimal
   # 13+: -c wal_keep_size=0
+
+x-sqlite-lib-base: &sqlite-lib-base
+  image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}-sqlite${SQLITE_VERSION}
+  pull_policy: never
+  build:
+    context: .
+    dockerfile_inline: |
+      FROM django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
+      SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
+      # Only compile SQLite and set LD_PRELOAD if a version is specified.
+      RUN <<EOF
+        if [[ "${SQLITE_VERSION}" ]]; then
+          export CFLAGS="${SQLITE_CFLAGS}"
+          git clone --depth 1 --branch version-${SQLITE_VERSION} \
+          https://github.com/sqlite/sqlite.git /tmp/sqlite
+          cd /tmp/sqlite
+          ./configure
+          make
+          cp .libs/libsqlite3.so /tmp/
+          rm -rf /tmp/sqlite
+        fi
+      EOF
+      SHELL ["/bin/bash", "-c"]
+      ENV LD_PRELOAD=${SQLITE_VERSION:+/tmp/libsqlite3.so}
+    args:
+      - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
+      - PYTHON_VERSION=${PYTHON_VERSION}
+      - SQLITE_VERSION=${SQLITE_VERSION}
+      - SQLITE_CFLAGS=${SQLITE_CFLAGS}
+    additional_contexts: *additional-contexts
 
 x-memcached: &memcached-base
   image: memcached:alpine
@@ -283,12 +313,17 @@ services:
       - DATABASE_ENGINE=django.db.backends.postgresql
       - DATABASE_HOST=postgresql-db
 
-  sqlite:
+  sqlite: &sqlite-base
     <<: *base
     depends_on:
       <<: *depends-on-caches
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
+
+  sqlite-lib:
+    <<:
+      - *sqlite-lib-base
+      - *sqlite-base
 
   # Commands: Tests: GIS
 

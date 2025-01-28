@@ -66,6 +66,7 @@ $ docker compose run --rm mysql
 $ docker compose run --rm oracle
 $ docker compose run --rm postgres
 $ docker compose run --rm sqlite
+$ docker compose run --rm sqlite-lib
 ```
 
 Each of the above commands will run the test suite for a different supported
@@ -204,7 +205,14 @@ The versions of various backend services can be switched by setting these enviro
 | `ORACLE_VERSION`        | `23.5.0.0`    | Version of Oracle container image to use             |
 | `POSTGRESQL_VERSION`    | `14`          | Version of PostgreSQL container image to use         |
 | `POSTGIS_VERSION`       | `3.1`         | Version of PostGIS extension to use                  |
+| `SQLITE_VERSION`        | `3.31.0`      | Version of SQLite to compile and use                 |
 
+> [!NOTE]
+>
+> Using a specific SQLite version requires compiling it from source. To
+> customize the `CFLAGS` used for the compilation, you can set the
+> `SQLITE_CFLAGS` environment variable. See the [`.env`][10] file for its
+> default value. For more details, see [SQLite Versions](#SQLite-Versions).
 
 ### Python Versions
 
@@ -229,7 +237,8 @@ restrictions with respect to the range of versions available.
 ### Database Versions
 
 Most database container images are pulled from [Docker Hub][2]. Oracle database
-is pulled from the [Oracle Container Registry][3].
+is pulled from the [Oracle Container Registry][3]. Specific versions of SQLite
+are compiled directly from the tags in the [official Git mirror][11].
 
 You can switch the version of the database you test against by changing the
 appropriate environment variable. Available options and their defaults can be
@@ -273,6 +282,41 @@ To determine what database versions can be used you can check the release notes
 for the branch of Django that you have checked out, or alternatively there is
 the [supported database versions][4] page on Django's Trac Wiki.
 
+#### SQLite Versions
+
+SQLite is normally bundled in the Python installation using the version
+available on the system where Python is compiled. We use the Python Docker image
+based on Debian `bookworm`, which has SQLite 3.40.1.
+
+To use a different version, we compile SQLite from source and load the library
+dynamically using `LD_PRELOAD`. There are a few caveats as a result:
+
+- Some SQLite features are only available if certain flags are set during
+  compilation. SQLite is known to change these flags in newer releases, such as
+  to enable features by default that were previously opt-in. When Python is
+  compiled, it inspects the system's SQLite to determine features that are
+  included in the `sqlite` module. A mismatch in the module and the dynamically
+  loaded library may result in Python failing to load, which may happen if we
+  use an SQLite version that is older than the system version.
+- Debian and Ubuntu use a custom `CFLAGS` variable to compile their distributed
+  SQLite. Historically, Django's CI has only been configured with SQLite
+  versions that come with the operating system. If SQLite is compiled with
+  different flags, some tests may fail.
+
+We currently work around the above caveats by setting the simplest `CFLAGS`
+value that allows all the tests to pass. In the future, the Django codebase may
+be more robust when tested against the different SQLite configurations and these
+workarounds may no longer be necessary.
+
+Running the tests against a specific SQLite version must be done using the
+`sqlite-lib` container instead of `sqlite`.
+
+```console
+$ docker compose run --rm sqlite-lib
+```
+
+This is done to avoid compiling SQLite when you are not testing against a
+specific version.
 
 ### Other Versions
 
@@ -309,3 +353,5 @@ with no promises that they'll be delivered:
 [7]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
 [8]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/unit-tests/#running-the-selenium-tests
 [9]: https://docs.djangoproject.com/en/stable/ref/contrib/gis/testing/#geodjango-tests
+[10]: .env
+[11]: https://github.com/sqlite/sqlite
