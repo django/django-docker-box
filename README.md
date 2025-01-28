@@ -36,7 +36,7 @@ Tooling and test execution support for [Django][0] :unicorn:
 3. Build the image:
 
    ```console
-   $ docker compose build sqlite
+   $ docker compose build base
    ```
 
 4. Run the tests:
@@ -66,7 +66,6 @@ $ docker compose run --rm mysql
 $ docker compose run --rm oracle
 $ docker compose run --rm postgres
 $ docker compose run --rm sqlite
-$ docker compose run --rm sqlite-lib
 ```
 
 Each of the above commands will run the test suite for a different supported
@@ -205,14 +204,13 @@ The versions of various backend services can be switched by setting these enviro
 | `ORACLE_VERSION`        | `23.5.0.0`    | Version of Oracle container image to use             |
 | `POSTGRESQL_VERSION`    | `14`          | Version of PostgreSQL container image to use         |
 | `POSTGIS_VERSION`       | `3.1`         | Version of PostGIS extension to use                  |
-| `SQLITE_VERSION`        | `3.31.0`      | Version of SQLite to compile and use                 |
+| `SQLITE_VERSION`        |               | Version of SQLite to compile and use                 |
 
 > [!NOTE]
 >
-> Using a specific SQLite version requires compiling it from source. To
-> customize the `CFLAGS` used for the compilation, you can set the
-> `SQLITE_CFLAGS` environment variable. See the [`.env`][10] file for its
-> default value. For more details, see [SQLite Versions](#SQLite-Versions).
+> If left unspecified, the SQLite version provided by Debian will be used.
+> Using a specific SQLite version requires compiling it from source. For more
+> details, see [SQLite Versions](#SQLite-Versions).
 
 ### Python Versions
 
@@ -304,19 +302,24 @@ dynamically using `LD_PRELOAD`. There are a few caveats as a result:
   different flags, some tests may fail.
 
 We currently work around the above caveats by setting the simplest `CFLAGS`
-value that allows all the tests to pass. In the future, the Django codebase may
-be more robust when tested against the different SQLite configurations and these
-workarounds may no longer be necessary.
+value that allows all the tests to pass. To customize the `CFLAGS` used for the
+compilation, you can set the `SQLITE_CFLAGS` environment variable. See the
+[`.env`][10] file for its default value.
 
-Running the tests against a specific SQLite version must be done using the
-`sqlite-lib` container instead of `sqlite`.
-
-```console
-$ docker compose run --rm sqlite-lib
+```
+SQLITE_VERSION=3.48.0 SQLITE_CFLAGS="-DSQLITE_OMIT_JSON -DSQLITE_MAX_VARIABLE_NUMBER=999" docker compose run --build --rm sqlite
 ```
 
-This is done to avoid compiling SQLite when you are not testing against a
-specific version.
+> [!NOTE]
+>
+> The `--build` argument is necessary if you've changed `SQLITE_CFLAGS` since
+> the last run, as it's not part of the image tag. You can also rebuild the
+> image separately by running `docker compose build sqlite`, optionally with
+> `--no-cache` to ignore the cached build.
+
+In the future, the Django codebase may be more robust when tested against
+different SQLite configurations and the `CFLAGS` workaround may no longer be
+necessary.
 
 ### Other Versions
 
