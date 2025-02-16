@@ -2,13 +2,14 @@
 
 x-base: &base
   image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
-  build:
+  build: &base-build
     context: .
     dockerfile: ./Containerfile
+    target: base
     args:
       - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
       - PYTHON_VERSION=${PYTHON_VERSION}
-    additional_contexts: &additional-contexts
+    additional_contexts:
       src: ${DJANGO_PATH:-../django}
   volumes:
     - ${DJANGO_PATH:-../django}:/django/source:rw
@@ -289,38 +290,17 @@ services:
 
   sqlite:
     <<: *base
-    image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}-sqlite${SQLITE_VERSION}
+    image: "django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}\
+      -sqlite${SQLITE_VERSION}"
     pull_policy: never
     build:
-      context: .
-      dockerfile_inline: |
-        FROM django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
-        SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
-        # Only compile SQLite and set LD_PRELOAD if a version is specified.
-        RUN <<EOF
-          if [[ "${SQLITE_VERSION}" ]]; then
-            export CFLAGS="${SQLITE_CFLAGS}"
-            git clone --depth 1 --branch version-${SQLITE_VERSION} \
-            https://github.com/sqlite/sqlite.git /tmp/sqlite
-            cd /tmp/sqlite
-            ./configure
-            make
-            if [ -f libsqlite3.so ]; then
-              cp libsqlite3.so /tmp/
-            else
-              cp .libs/libsqlite3.so /tmp/
-            fi
-            rm -rf /tmp/sqlite
-          fi
-        EOF
-        SHELL ["/bin/bash", "-c"]
-        ENV LD_PRELOAD=${SQLITE_VERSION:+/tmp/libsqlite3.so}
+      <<: *base-build
+      target: sqlite
       args:
         - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
         - PYTHON_VERSION=${PYTHON_VERSION}
         - SQLITE_VERSION=${SQLITE_VERSION}
         - SQLITE_CFLAGS=${SQLITE_CFLAGS}
-      additional_contexts: *additional-contexts
     depends_on:
       <<: *depends-on-caches
     environment:
