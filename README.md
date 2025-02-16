@@ -321,6 +321,10 @@ In the future, the Django codebase may be more robust when tested against
 different SQLite configurations and the `CFLAGS` workaround may no longer be
 necessary.
 
+Running SpatiaLite tests against specific versions of SQLite/SpatiaLite is not
+currently supported. The versions of SQLite and SpatiaLite that come with the
+operating system are used for these tests.
+
 ### Other Versions
 
 For the Memcached, Redis, and Selenium container images, the latest container
@@ -341,7 +345,7 @@ with no promises that they'll be delivered:
 - Add support for running accessibility tooling and report generation
 - Support report generation during monthly runs and publish to GitHub Pages
 - Publish pre-built container images to the GitHub Container Registry
-- Support testing against different versions of SQLite and SpatiaLite
+- Support testing against different versions of SpatiaLite
 - Support running with Podman in addition to Docker
 - Support generating screenshots into `./output/screenshots/`
 
