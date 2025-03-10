@@ -1,0 +1,44 @@
+sudo: required
+dist: trusty
+services:
+- docker
+python: 3.6
+language: python
+cache: pip
+
+env:
+# Browsers:
+- COMPOSE_APP=chrome PYTHON_VERSION=3.6
+- COMPOSE_APP=firefox PYTHON_VERSION=3.6
+
+matrix:
+  allow_failures:
+    - env: COMPOSE_APP=firefox PYTHON_VERSION=3.6
+
+before_install:
+  - echo 'DOCKER_OPTS="${DOCKER_OPTS} --registry-mirror=https://mirror.gcr.io"' | sudo tee -a /etc/default/docker
+  - sudo service docker restart
+
+install:
+- pip install docker-compose --upgrade
+
+script:
+- git clone https://github.com/django/django.git --depth=1 /tmp/django
+- export DJANGO_PATH=/tmp/django
+- docker-compose pull --include-deps $COMPOSE_APP || true
+- docker-compose build --pull $COMPOSE_APP
+- |
+  if [[ $COMPOSE_APP == *-gis ]]; then
+    docker-compose run $COMPOSE_APP gis_tests
+  else
+    docker-compose run $COMPOSE_APP
+  fi
+
+after_failure:
+  - docker-compose logs
+
+deploy:
+  provider: script
+  script: bash docker_push.sh $COMPOSE_APP
+  on:
+    branch: master
