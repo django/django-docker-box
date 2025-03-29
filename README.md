@@ -25,7 +25,7 @@ Tooling and test execution support for [Django][0] :unicorn:
    $ mkdir ~/Sources
    $ cd ~/Sources
    $ git clone https://github.com/django/django.git
-   $ git clone https://github.com/django-docker-box/django-docker-box.git
+   $ git clone https://github.com/django/django-docker-box.git
    $ cd django-docker-box
    ```
 
