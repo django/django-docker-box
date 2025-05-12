@@ -199,7 +199,7 @@ The versions of various backend services can be switched by setting these enviro
 
 | Environment Variable    | Default Value | Description                                          |
 | ----------------------- | ------------- | ---------------------------------------------------- |
-| `MARIADB_VERSION`       | `10.5`        | Version of MariaDB container image to use            |
+| `MARIADB_VERSION`       | `10.6`        | Version of MariaDB container image to use            |
 | `MYSQL_VERSION`         | `8.0`         | Version of MySQL container image to use              |
 | `ORACLE_VERSION`        | `23.5.0.0`    | Version of Oracle container image to use             |
 | `POSTGRESQL_VERSION`    | `14`          | Version of PostgreSQL container image to use         |
