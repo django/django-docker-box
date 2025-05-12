@@ -64,7 +64,7 @@ To run the standard set of tests you can use the following commands:
 $ docker compose run --rm mariadb
 $ docker compose run --rm mysql
 $ docker compose run --rm oracle
-$ docker compose run --rm postgres
+$ docker compose run --rm postgresql
 $ docker compose run --rm sqlite
 ```
 
@@ -83,7 +83,7 @@ To run tests on geospatial features you can use the following commands:
 $ docker compose run --rm mariadb-gis
 $ docker compose run --rm mysql-gis
 $ docker compose run --rm oracle-gis
-$ docker compose run --rm postgres-gis
+$ docker compose run --rm postgresql-gis
 $ docker compose run --rm sqlite-gis
 ```
 
