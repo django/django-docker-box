@@ -193,7 +193,7 @@ environment variables:
 | ----------------------- | ------------- | ---------------------------------------------------- |
 | `DJANGO_PATH`           | `../django`   | Path to the Django repostory on your local machine   |
 | `PYTHON_IMPLEMENTATION` | `python`      | Implementation of Python to use — `python` or `pypy` |
-| `PYTHON_VERSION`        | `3.12`        | Version of Python container image to use             |
+| `PYTHON_VERSION`        | `3.13`        | Version of Python container image to use             |
 
 The versions of various backend services can be switched by setting these environment variables:
 
@@ -212,7 +212,7 @@ The `PYTHON_VERSION` environment variable controls which version of Python you
 are running the tests against, e.g.
 
 ```console
-$ PYTHON_VERSION=3.12 docker compose run --rm sqlite
+$ PYTHON_VERSION=3.13 docker compose run --rm sqlite
 ```
 
 In addition, it's possible to select a different implementation of Python, i.e.
