@@ -57,8 +57,6 @@ CACHES = {
 
 DATABASES = _build_databases_setting()
 
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 SECRET_KEY = "django_tests_secret_key"
