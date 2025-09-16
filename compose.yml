@@ -2,9 +2,10 @@
 
 x-base: &base
   image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
-  build:
+  build: &base-build
     context: .
     dockerfile: ./Containerfile
+    target: base
     args:
       - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
       - PYTHON_VERSION=${PYTHON_VERSION}
@@ -138,6 +139,10 @@ volumes:
   user-cache:
 
 services:
+
+  # Base service to allow building the image with `docker compose build base`.
+  base:
+    <<: *base
 
   # Services: Databases
 
@@ -285,6 +290,17 @@ services:
 
   sqlite:
     <<: *base
+    image: "django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}\
+      -sqlite${SQLITE_VERSION}"
+    pull_policy: never
+    build:
+      <<: *base-build
+      target: sqlite
+      args:
+        - PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
+        - PYTHON_VERSION=${PYTHON_VERSION}
+        - SQLITE_VERSION=${SQLITE_VERSION}
+        - SQLITE_CFLAGS=${SQLITE_CFLAGS}
     depends_on:
       <<: *depends-on-caches
     environment:

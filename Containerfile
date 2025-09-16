@@ -2,7 +2,7 @@
 
 ARG PYTHON_IMPLEMENTATION=python
 ARG PYTHON_VERSION=3.12
-FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-bookworm
+FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-bookworm AS base
 
 LABEL org.opencontainers.image.authors="Django Software Foundation"
 LABEL org.opencontainers.image.url="https://github.com/django/django-docker-box"
@@ -64,3 +64,30 @@ VOLUME /django/output
 VOLUME /django/source
 WORKDIR /django/source/tests
 ENTRYPOINT ["/django/entrypoint.bash"]
+
+FROM base AS sqlite
+ARG SQLITE_VERSION
+ARG SQLITE_CFLAGS
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
+# Use cd instead of WORKDIR to allow wrapping the compilation in a single layer.
+# https://github.com/hadolint/hadolint/issues/422
+# hadolint ignore=DL3003
+RUN <<EOF
+if [[ "${SQLITE_VERSION}" ]]; then
+  export CFLAGS="${SQLITE_CFLAGS}"
+  git clone --depth 1 --branch version-${SQLITE_VERSION} \
+  https://github.com/sqlite/sqlite.git /tmp/sqlite
+  cd /tmp/sqlite || exit 1
+  ./configure
+  make
+  if [ -f libsqlite3.so ]; then
+    cp libsqlite3.so /tmp/
+  else
+    cp .libs/libsqlite3.so /tmp/
+  fi
+  rm -rf /tmp/sqlite
+fi
+EOF
+
+SHELL ["/bin/bash", "-c"]
+ENV LD_PRELOAD=${SQLITE_VERSION:+/tmp/libsqlite3.so}
