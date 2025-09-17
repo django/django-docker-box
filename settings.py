@@ -1,4 +1,5 @@
 import os
+import django
 
 
 def _build_databases_setting():
@@ -57,7 +58,9 @@ CACHES = {
 
 DATABASES = _build_databases_setting()
 
-DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+# Only set DEFAULT_AUTO_FIELD for Django <= 5.2
+if django.VERSION < (5, 3):
+    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
