@@ -1,7 +1,7 @@
 ---
 
 x-base: &base
-  image: django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}
+  image: ${DOCKER_BOX_IMAGE:-django-docker-box:${PYTHON_IMPLEMENTATION}-${PYTHON_VERSION}}  # yamllint disable-line rule:line-length
   build:
     context: .
     dockerfile: ./Containerfile
