@@ -1,0 +1,143 @@
+---
+name: Publish Docker images for Django Docker Box
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: [pkgs]
+
+env:
+  REGISTRY: ghcr.io
+  REGISTRY_WITH_PATH: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        python_implementation: [python]
+        python_version: ["3.12", "3.13"]
+        django_version: ["4.2", "5.1", "5.2", "main"]
+        exclude:
+          # Exclude PyPy versions that are not available
+          - python_implementation: pypy
+            python_version: "3.12"
+          - python_implementation: pypy
+            python_version: "3.13"
+    env:
+      # yamllint disable rule:line-length
+      DOCKER_IMAGE_TAG: ${{ matrix.python_implementation }}-${{ matrix.python_version }}-django-${{ matrix.django_version }}
+      # yamllint enable rule:line-length
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_WITH_PATH }}/django-docker-box
+          tags: |
+            type=raw,value=${{ env.DOCKER_IMAGE_TAG }}
+      - name: Download Django source
+        # yamllint disable rule:line-length
+        run: |
+          if [ "${{ matrix.django_version }}" = "main" ]; then
+            branch=main
+            dirname=django-main
+          else
+            branch=stable/${{ matrix.django_version }}.x
+            dirname=django-stable-${{ matrix.django_version }}.x
+          fi
+          curl -L https://github.com/django/django/archive/refs/heads/$branch.tar.gz | tar xz
+          mv $dirname django-src
+        # yamllint enable rule:line-length
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Containerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            PYTHON_IMPLEMENTATION=${{ matrix.python_implementation }}
+            PYTHON_VERSION=${{ matrix.python_version }}
+            DJANGO_PATH=django-src
+          build-contexts: |
+            src=django-src
+          # yamllint disable rule:line-length
+          cache-from: type=registry,ref=${{ env.REGISTRY_WITH_PATH }}/django-docker-box:buildcache-${{ env.DOCKER_IMAGE_TAG }}
+          cache-to: type=registry,ref=${{ env.REGISTRY_WITH_PATH }}/django-docker-box:buildcache-${{ env.DOCKER_IMAGE_TAG }},mode=max
+          # yamllint enable rule:line-length
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  test-image:
+    needs: build-push-image
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_implementation: [python]
+        python_version: ["3.12", "3.13"]
+        django_version: ["5.2", "main"]
+        test_service:
+          - mariadb
+          - mysql
+          - oracle
+          - postgresql
+          - sqlite
+          - mariadb-gis
+          - mysql-gis
+          - oracle-gis
+          - postgresql-gis
+          - sqlite-gis
+      fail-fast: false
+    env:
+      REGISTRY: ghcr.io
+      REGISTRY_PATH: ghcr.io/${{ github.repository_owner }}/django-docker-box
+      # yamllint disable rule:line-length
+      IMAGE_TAG: ${{ matrix.python_implementation }}-${{ matrix.python_version }}-django-${{ matrix.django_version }}
+      # yamllint enable rule:line-length
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Pull image
+        run: |
+          docker pull ${{ env.REGISTRY_PATH }}:${{ env.IMAGE_TAG }}
+      # yamllint disable rule:line-length
+      - name: Download Django source
+        run: |
+          if [ "${{ matrix.django_version }}" = "main" ]; then
+            branch=main
+            dirname=django-main
+          else
+            branch=stable/${{ matrix.django_version }}.x
+            dirname=django-stable-${{ matrix.django_version }}.x
+          fi
+          curl -L https://github.com/django/django/archive/refs/heads/$branch.tar.gz | tar xz
+          mv $dirname django-src
+      # yamllint enable rule:line-length
+      - name: Run tests for ${{ matrix.test_service }}
+        run: |
+          export DOCKER_BOX_IMAGE=${{ env.REGISTRY_PATH }}:${{ env.IMAGE_TAG }}
+          export DJANGO_PATH=./django-src/
+          docker compose run --rm ${{ matrix.test_service }}

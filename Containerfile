@@ -19,9 +19,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
 # Force colored output for various tooling in CI.
-ENV COLUMNS=120
-ENV FORCE_COLOR=1
-ENV TERM="xterm-256color"
+# ENV COLUMNS=120
+# ENV FORCE_COLOR=1
+# ENV TERM="xterm-256color"
 
 # Create user and prepare directories.
 RUN <<EOF
