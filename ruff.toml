@@ -8,4 +8,7 @@ select = [
     # https://docs.astral.sh/ruff/rules/#pyflakes-f
     # https://github.com/PyCQA/pyflakes
     "F",
+    # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    # https://github.com/asottile/pyupgrade
+    "UP",
 ]
