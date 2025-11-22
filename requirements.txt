@@ -1,3 +1,2 @@
-black
 pre-commit
 unittest-xml-reporting

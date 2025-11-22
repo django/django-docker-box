@@ -389,10 +389,6 @@ services:
     <<: *base
     entrypoint: pre-commit run --all-files
     working_dir: /django/source
-    environment:
-      # XXX: Disable eslint due to issues finding dependencies.
-      #      See https://github.com/django/django/pull/18162
-      SKIP: eslint
 
   sphinx:
     <<: *base
