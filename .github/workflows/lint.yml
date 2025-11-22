@@ -20,7 +20,7 @@ env:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: pre-commit
     steps:
       - name: Checkout
