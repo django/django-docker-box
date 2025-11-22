@@ -2,7 +2,7 @@
 
 ARG PYTHON_IMPLEMENTATION=python
 ARG PYTHON_VERSION=3.13
-FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-bookworm
+FROM ${PYTHON_IMPLEMENTATION}:${PYTHON_VERSION}-slim-trixie
 
 LABEL org.opencontainers.image.authors="Django Software Foundation"
 LABEL org.opencontainers.image.url="https://github.com/django/django-docker-box"
