@@ -128,22 +128,11 @@ in the documentation.
 
 ### Linting & Formatting
 
-Django uses the following linting and formatting tools: `black`, `flake8`,
-`isort`, and `eslint`. To ensure that the correct versions are used, Django
-also supports using `pre-commit` which is the mechanism provided here:
+The project uses `pre-commit` to configure and manage lint and formating tools.
+Those tools can be invoked using the following command:
 
 ```console
 $ docker compose run --rm pre-commit
-```
-
-You can run individual tools by passing them as an argument:
-
-```console
-$ docker compose run --rm pre-commit black
-$ docker compose run --rm pre-commit blacken-docs
-$ docker compose run --rm pre-commit isort
-$ docker compose run --rm pre-commit flake8
-$ docker compose run --rm pre-commit eslint  # XXX: Currently not working.
 ```
 
 More information about Django's [coding style][5] can be found in the
