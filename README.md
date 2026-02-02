@@ -143,7 +143,7 @@ $ docker compose run --rm pre-commit black
 $ docker compose run --rm pre-commit blacken-docs
 $ docker compose run --rm pre-commit isort
 $ docker compose run --rm pre-commit flake8
-$ docker compose run --rm pre-commit eslint  # XXX: Currently not working.
+$ docker compose run --rm pre-commit eslint
 ```
 
 More information about Django's [coding style][5] can be found in the
