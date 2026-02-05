@@ -1,0 +1,19 @@
+line-length = 88
+required-version = ">=0.15.0"
+
+[format]
+docstring-code-format = true
+
+[lint]
+future-annotations = true
+select = ["ALL"]
+ignore = [
+    "COM812",   # https://docs.astral.sh/ruff/rules/missing-trailing-comma/
+    "PLR2004",  # https://docs.astral.sh/ruff/rules/magic-value-comparison
+]
+
+[lint.pycodestyle]
+max-doc-length = 79
+
+[lint.pydocstyle]
+convention = "pep257"

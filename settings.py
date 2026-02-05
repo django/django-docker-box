@@ -1,7 +1,10 @@
+"""Generic generated settings module supporting all database backends."""
+
 import os
+from typing import Any
 
 
-def _build_databases_setting():
+def _build_databases_setting() -> dict[str, Any]:
     engine = os.environ["DATABASE_ENGINE"]
     host = os.environ.get("DATABASE_HOST", "")
     name = os.environ.get("DATABASE_NAME", "")
@@ -59,7 +62,7 @@ DATABASES = _build_databases_setting()
 
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
-SECRET_KEY = "django_tests_secret_key"
+SECRET_KEY = "django_tests_secret_key"  # noqa: S105
 
 USE_TZ = False
 
