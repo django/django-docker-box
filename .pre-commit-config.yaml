@@ -7,7 +7,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-builtin-literals
@@ -26,28 +26,26 @@ repos:
         args: [--unique]
         files: ^(?:packages|requirements)\.txt$
       - id: fix-byte-order-marker
-      - id: fix-encoding-pragma
-        args: [--remove]
       - id: requirements-txt-fixer
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.2
+    rev: v0.15.0
     hooks:
       - id: ruff
         args: [--exit-non-zero-on-fix, --fix]
       - id: ruff-format
         args: [--check]
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.35.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
+    rev: v2.14.0
     hooks:
       - id: hadolint-docker
         name: hadolint
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v0.9.2
+    rev: v1.22.0
     hooks:
       - id: zizmor
