@@ -1,5 +1,3 @@
 ---
 ignored:
-  - DL3013  # Don't complain when upgrading to latest version of pip
   - DL3022  # Due to use of additional_contexts in compose.yaml
-  - DL3042  # Caching is desired with RUN --mount=type=cache
