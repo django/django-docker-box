@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+    steps:
+      -
+        name: Check out the docker repo
+        uses: actions/checkout@v3
+        with:
+          path: dockerdir
+      -
+        name: Check out the django repo
+        uses: actions/checkout@v3
+        with:
+          repository: django/django
+          path: djangodir
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/django-docker-box
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: djangodir
+          file: dockerdir/Dockerfile
+          build-args: PYTHON_VERSION=${{ matrix.python-version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/django-docker-box:${{ matrix.python-version }}
+
