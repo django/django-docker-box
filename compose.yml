@@ -71,16 +71,17 @@ x-postgresql-base: &postgresql-base
     start_interval: 1s
   command: >-
     -c archive_mode=off
-    -c checkpoint_completion_target=0.9
-    -c checkpoint_timeout=900
+    -c bgwriter_lru_maxpages=0
+    -c checkpoint_timeout=1800
     -c fsync=off
     -c full_page_writes=off
+    -c jit=off
     -c max_replication_slots=0
     -c max_wal_senders=0
     -c max_wal_size=4096
     -c synchronous_commit=off
+    -c wal_keep_size=0
     -c wal_level=minimal
-  # 13+: -c wal_keep_size=0
 
 x-memcached: &memcached-base
   image: memcached:alpine
