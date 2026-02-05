@@ -200,10 +200,10 @@ The versions of various backend services can be switched by setting these enviro
 | Environment Variable    | Default Value | Description                                          |
 | ----------------------- | ------------- | ---------------------------------------------------- |
 | `MARIADB_VERSION`       | `10.11`       | Version of MariaDB container image to use            |
-| `MYSQL_VERSION`         | `8.0`         | Version of MySQL container image to use              |
+| `MYSQL_VERSION`         | `8.4`         | Version of MySQL container image to use              |
 | `ORACLE_VERSION`        | `23.5.0.0`    | Version of Oracle container image to use             |
-| `POSTGRESQL_VERSION`    | `14`          | Version of PostgreSQL container image to use         |
-| `POSTGIS_VERSION`       | `3.1`         | Version of PostGIS extension to use                  |
+| `POSTGRESQL_VERSION`    | `15`          | Version of PostgreSQL container image to use         |
+| `POSTGIS_VERSION`       | `3.2`         | Version of PostGIS extension to use                  |
 
 
 ### Python Versions
