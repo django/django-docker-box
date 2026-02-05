@@ -10,7 +10,7 @@ def _build_databases_setting():
     for n, alias in enumerate(("default", "other"), start=1):
         settings[alias] = entry = {"ENGINE": engine}
 
-        if not engine.endswith((".sqlite", ".spatialite")):
+        if not engine.endswith((".sqlite3", ".spatialite")):
             entry |= {
                 "HOST": host,
                 "NAME": "django" if n < 2 else f"django{n}",
