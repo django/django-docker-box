@@ -129,7 +129,7 @@ in the documentation.
 ### Linting & Formatting
 
 Django uses the following linting and formatting tools: `black`, `flake8`,
-`isort`, and `eslint`. To ensure that the correct versions are used, Django
+`isort`, and `biome`. To ensure that the correct versions are used, Django
 also supports using `pre-commit` which is the mechanism provided here:
 
 ```console
@@ -143,7 +143,8 @@ $ docker compose run --rm pre-commit black
 $ docker compose run --rm pre-commit blacken-docs
 $ docker compose run --rm pre-commit isort
 $ docker compose run --rm pre-commit flake8
-$ docker compose run --rm pre-commit eslint
+$ docker compose run --rm pre-commit biome-check
+$ docker compose run --rm pre-commit zizmor
 ```
 
 More information about Django's [coding style][5] can be found in the
