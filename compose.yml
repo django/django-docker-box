@@ -13,7 +13,7 @@ x-base: &base
   volumes:
     - ${DJANGO_PATH:-../django}:/django/source:rw
     - ./output:/django/output:rw
-    - ./settings.py:/django/source/tests/settings.py:ro
+    - ./settings.py:/django/config/docker_settings.py:ro
     - user-cache:/django/.cache/:rw
 
 x-mysql-base: &mysql-base

@@ -26,7 +26,7 @@ ENV TERM="xterm-256color"
 # Create user and prepare directories.
 RUN <<EOF
     useradd --home-dir=/django --no-create-home --no-log-init django
-    mkdir --parents /django/{.cache,output,source}
+    mkdir --parents /django/{.cache,config,output,source}
     chown --recursive django:django /django
 EOF
 
@@ -54,11 +54,12 @@ RUN --mount=type=cache,target=/root/.cache/uv <<EOF
 EOF
 
 COPY --chown=django:django entrypoint.bash /django/
+COPY --chown=django:django settings.py /django/config/docker_settings.py
 
 SHELL ["/bin/bash", "-c"]
 
-ENV DJANGO_SETTINGS_MODULE=settings
-ENV PYTHONPATH="${PYTHONPATH}:/django/source/"
+ENV DJANGO_SETTINGS_MODULE=docker_settings
+ENV PYTHONPATH="${PYTHONPATH}:/django/source/:/django/config/"
 USER django:django
 VOLUME /django/output
 VOLUME /django/source
