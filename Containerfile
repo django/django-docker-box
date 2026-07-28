@@ -54,7 +54,6 @@ RUN --mount=type=cache,target=/root/.cache/uv <<EOF
 EOF
 
 COPY --chown=django:django entrypoint.bash /django/
-COPY --chown=django:django settings.py /django/config/docker_settings.py
 
 SHELL ["/bin/bash", "-c"]
 
