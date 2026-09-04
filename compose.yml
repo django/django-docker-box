@@ -121,16 +121,9 @@ x-cache-depends: &depends-on-caches
   redis:
     condition: service_healthy
 
-x-selenium-base: &selenium-base
+x-playwright-base: &playwright-base
+  image: mcr.microsoft.com/playwright
   shm_size: 2gb
-  environment:
-    - SE_EVENT_BUS_HOST=selenium-hub
-    - SE_EVENT_BUS_PUBLISH_PORT=4442
-    - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-    - SE_NODE_GRID_URL=http://selenium-hub:4444
-  depends_on:
-    selenium-hub:
-      condition: service_started
   deploy:
     mode: global
   restart: unless-stopped
@@ -215,32 +208,16 @@ services:
   redis:
     <<: *redis-base
 
-  # Services: Selenium
+  # Services: Playwright
 
-  selenium-chrome:
-    <<: *selenium-base
-    image: selenium/node-chrome
+  playwright-chrome:
+    <<: *playwright-base
 
-  selenium-edge:
-    <<: *selenium-base
-    image: selenium/node-edge
-
-  selenium-firefox:
-    <<: *selenium-base
-    image: selenium/node-firefox
-
-  selenium-hub:
-    image: selenium/hub
-    ports:
-      - "4442-4444:4442-4444"
-    deploy:
-      mode: global
-    restart: unless-stopped
-    healthcheck:
-      test: /opt/bin/check-grid.sh
-      interval: 15s
-      timeout: 30s
-      retries: 5
+  playwright-firefox:
+    <<: *playwright-base
+  
+  playwright-webkit:
+    <<: *playwright-base
 
   # Commands: Tests
 
@@ -340,32 +317,15 @@ services:
     environment:
       - DATABASE_ENGINE=django.contrib.gis.db.backends.spatialite
 
-  # Commands: Tests: Selenium
+  # Commands: Tests: Playwright
 
   chrome:
     <<: *base
     entrypoint: >-
       /django/entrypoint.bash
-      --selenium=chrome
-      --selenium-hub=http://selenium-hub:4444/wd/hub
+      --playwright=chromium
     depends_on:
-      selenium-hub:
-        condition: service_healthy
-      selenium-chrome:
-        condition: service_started
-    environment:
-      - DATABASE_ENGINE=django.db.backends.sqlite3
-
-  edge:
-    <<: *base
-    entrypoint: >-
-      /django/entrypoint.bash
-      --selenium=edge
-      --selenium-hub=http://selenium-hub:4444/wd/hub
-    depends_on:
-      selenium-hub:
-        condition: service_healthy
-      selenium-edge:
+      playwright-chrome:
         condition: service_started
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
@@ -374,16 +334,23 @@ services:
     <<: *base
     entrypoint: >-
       /django/entrypoint.bash
-      --selenium=firefox
-      --selenium-hub=http://selenium-hub:4444/wd/hub
+      --playwright=firefox
     depends_on:
-      selenium-hub:
-        condition: service_healthy
-      selenium-firefox:
+      playwright-firefox:
         condition: service_started
     environment:
       - DATABASE_ENGINE=django.db.backends.sqlite3
 
+  webkit:
+    <<: *base
+    entrypoint: >-
+      /django/entrypoint.bash
+      --playwright=webkit
+    depends_on:
+      playwright-webkit:
+        condition: service_started
+    environment:
+      - DATABASE_ENGINE=django.db.backends.sqlite3
   # Commands: Other
 
   pre-commit:

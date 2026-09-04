@@ -59,7 +59,11 @@ SHELL ["/bin/bash", "-c"]
 
 ENV DJANGO_SETTINGS_MODULE=docker_settings
 ENV PYTHONPATH="${PYTHONPATH}:/django/source/:/django/config/"
+ENV PLAYWRIGHT_BROWSERS_PATH=/django/.cache/ms-playwright
+RUN chown --recursive django:django /django/.cache
+
 USER django:django
+
 VOLUME /django/output
 VOLUME /django/source
 WORKDIR /django/source/tests

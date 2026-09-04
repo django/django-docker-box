@@ -9,7 +9,7 @@ Tooling and test execution support for [Django][0] :unicorn:
 
 - :test\_tube: Test supported core database backends — MariaDB, MySQL, Oracle, PostgreSQL, SQLite
 - :earth\_africa: Test supported core geospatial backends — MariaDB, MySQL, Oracle, PostGIS, SpatiaLite
-- :globe\_with\_meridians: Test user interfaces in different browsers using Selenium — Chrome, Edge, Firefox
+- :globe\_with\_meridians: Test user interfaces in different browsers using Playwright — Chromium, Firefox, Webkit
 - :snake: Test using different Python interpreters — CPython, PyPy
 - :broom: Execute linting and formatting tools on the Django repository
 - :books: Build the project documentation using Sphinx and run spelling and link checkers
@@ -109,17 +109,17 @@ To run tests on user interfaces you can use the following commands:
 
 ```console
 $ docker compose run --rm chrome
-$ docker compose run --rm edge
+$ docker compose run --rm webkit
 $ docker compose run --rm firefox
 ```
 
 Each of the above commands will run the subset of user interface tests for a
-different supported web browser. The tests are executed using Selenium.
+different supported web browser. The tests are executed using Playwright.
 
 To capture screenshots of certain test cases used for comparison to avoid
 regressions, the `--screenshots` flag can be passed.
 
-More information about [running the Selenium tests][8] for Django can be found
+More information about [running the Playwright tests][8] for Django can be found
 in the documentation.
 
 
@@ -277,7 +277,7 @@ the [supported database versions][4] page on Django's Trac Wiki.
 
 ### Other Versions
 
-For the Memcached, Redis, and Selenium container images, the latest container
+For the Memcached, Redis, and Playwright container images, the latest container
 image tag is always used.
 
 Where possible, for backend services, we also use Alpine images where available
@@ -308,5 +308,5 @@ with no promises that they'll be delivered:
 [5]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/coding-style/
 [6]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-documentation/
 [7]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
-[8]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/unit-tests/#running-the-selenium-tests
+[8]: https://docs.djangoproject.com/en/stable/internals/contributing/writing-code/unit-tests/#running-the-playwright-tests
 [9]: https://docs.djangoproject.com/en/stable/ref/contrib/gis/testing/#geodjango-tests
