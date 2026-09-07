@@ -1,0 +1,211 @@
+name: Run tests
+on: [push]
+
+jobs:
+  docs:
+    name: ${{ matrix.compose_app }}
+    strategy:
+      fail-fast: false
+      matrix:
+        compose_app:
+          - flake8
+          - docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps ${{ matrix.compose_app }} || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull ${{ matrix.compose_app }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run ${{ matrix.compose_app }}
+
+  sqlite:
+    name: sqlite
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps sqlite || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull sqlite
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run sqlite
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+
+  sqlite-gis:
+    name: sqlite-gis
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps sqlite-gis || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull sqlite-gis
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run sqlite-gis gis_tests
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+
+  postgres:
+    name: postgres
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+        db_version:
+          - 9.5
+          - 9.6
+          - 10
+          - 11
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps postgres || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull postgres
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          POSTGRES_VERSION: ${{ matrix.db_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run postgres
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          POSTGRES_VERSION: ${{ matrix.db_version }}
+
+  postgres-gis:
+    name: postgres-gis
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+        db_version:
+          - 9.5
+          - 9.6
+          - 10
+          - 11
+        postgis_version:
+          - 2.4
+          - 2.5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps postgres-gis || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull postgres-gis
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          POSTGRES_VERSION: ${{ matrix.db_version }}
+          POSTGIS_VERSION: ${{ matrix.postgis_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run postgres-gis gis_tests
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          POSTGRES_VERSION: ${{ matrix.db_version }}
+          POSTGIS_VERSION: ${{ matrix.postgis_version }}
+
+  mysql:
+    name: mysql
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+        db_version:
+          - 5.6
+          - 5.7
+          - 8.0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps mysql || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull mysql
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MYSQL_VERSION: ${{ matrix.db_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run mysql
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MYSQL_VERSION: ${{ matrix.db_version }}
+
+  mysql-gis:
+    name: mysql-gis
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+        db_version:
+          - 5.6
+          - 5.7
+          - 8.0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps mysql-gis || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull mysql-gis
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MYSQL_VERSION: ${{ matrix.db_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run mysql-gis gis_tests
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MYSQL_VERSION: ${{ matrix.db_version }}
+
+  mariadb:
+    name: mariadb
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - 3.6
+          - 3.7
+        db_version:
+          - 10.1
+          - 10.2
+          - 10.3
+          - 10.4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps mariadb || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull mariadb
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MARIADB_VERSION: ${{ matrix.db_version }}
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run mariadb
+        env:
+          PYTHON_VERSION: ${{ matrix.python_version }}
+          MARIADB_VERSION: ${{ matrix.db_version }}
+
+  browsers:
+    name: browsers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - run: git clone https://github.com/django/django.git --depth=1 ${GITHUB_WORKSPACE}/django
+      - run: docker-compose pull --include-deps chrome || true
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose build --pull chrome
+        env:
+          PYTHON_VERSION: 3.6
+      - run: DJANGO_PATH=${GITHUB_WORKSPACE}/django docker-compose run chrome
+        env:
+          PYTHON_VERSION: 3.6
