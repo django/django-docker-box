@@ -29,7 +29,7 @@ repos:
       - id: requirements-txt-fixer
       - id: trailing-whitespace
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.0
+    rev: v0.17.3
     hooks:
       - id: ruff
         args: [--exit-non-zero-on-fix, --fix]
@@ -41,11 +41,11 @@ repos:
       - id: yamllint
         args: [--strict]
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.14.0
+    rev: v2.15.1
     hooks:
       - id: hadolint-docker
         name: hadolint
   - repo: https://github.com/woodruffw/zizmor-pre-commit
-    rev: v1.22.0
+    rev: v1.31.1
     hooks:
       - id: zizmor
