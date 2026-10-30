@@ -1,5 +1,5 @@
 line-length = 88
-required-version = ">=0.15.0"
+required-version = ">=0.17.0"
 
 [format]
 docstring-code-format = true
@@ -9,6 +9,7 @@ future-annotations = true
 select = ["ALL"]
 ignore = [
     "COM812",   # https://docs.astral.sh/ruff/rules/missing-trailing-comma/
+    "CPY001",   # https://docs.astral.sh/ruff/rules/missing-copyright-notice/
     "PLR2004",  # https://docs.astral.sh/ruff/rules/magic-value-comparison
 ]
 
