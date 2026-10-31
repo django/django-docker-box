@@ -13,8 +13,6 @@ LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 LABEL org.opencontainers.image.title="Django Docker Box"
 LABEL org.opencontainers.image.description="Container image for developing and testing Django."
 
-SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
-
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
@@ -22,6 +20,8 @@ ENV PYTHONUNBUFFERED=1
 ENV COLUMNS=120
 ENV FORCE_COLOR=1
 ENV TERM="xterm-256color"
+
+SHELL ["/bin/bash", "-o", "errexit", "-o", "nounset", "-o", "pipefail", "-o", "xtrace", "-c"]
 
 # Create user and prepare directories.
 RUN <<EOF

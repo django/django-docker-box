@@ -1,3 +1,4 @@
 ---
 ignored:
   - DL3022  # Due to use of additional_contexts in compose.yaml
+  - DL3066  # Relevant only for Kubernetes
